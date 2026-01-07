@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+  name     String
+  level    String @default("admin")
+  status   String @default("use")
+}
+
+model FoodType {
+  id        Int        @id @default(autoincrement())
+  name      String
+  remark    String
+  status    String     @default("use")
+  FoodSizes FoodSize[]
+  Tastes    Taste[]
+  Foods     Food[]
+}
+
+model FoodSize {
+  id         Int      @id @default(autoincrement())
+  name       String
+  remark     String
+  foodTypeId Int
+  moneyAdded Int
+  status     String   @default("use")
+  FoodType   FoodType @relation(fields: [foodTypeId], references: [id])
+  SaleTempdetails SaleTempDetail[]
+}
+
+model Taste {
+  id         Int      @id @default(autoincrement())
+  name       String
+  remark     String
+  status     String   @default("use")
+  foodTypeId Int
+  FoodType   FoodType @relation(fields: [foodTypeId], references: [id])
+  SaleTempdetails SaleTempDetail[]
+}
+
+model Food {
+  id         Int      @id @default(autoincrement())
+  name       String
+  img        String
+  remark     String
+  status     String   @default("use")
+  price      Int
+  foodType   String   @default("food")
+  foodTypeId Int
+  FoodType   FoodType @relation(fields: [foodTypeId], references: [id])
+  SaleTempdetails SaleTempDetail[]
+}
+
+model SaleTemp {
+  id      Int    @id @default(autoincrement())
+  userId  Int
+  tableNo Int
+  SaleTempdetails SaleTempDetail[]
+}
+
+model SaleTempDetail {
+  id Int @id @default(autoincrement())
+  saleTempId Int
+  foodId Int
+  tasteId Int?
+  foodSizeId Int?
+  Food Food @relation(fields: [foodId], references: [id])
+  Taste Taste? @relation(fields: [tasteId], references: [id])
+  FoodSize FoodSize? @relation(fields: [foodSizeId], references: [id])
+  SaleTemp SaleTemp @relation(fields: [saleTempId], references: [id])
+}
