@@ -86,39 +86,44 @@ export const remove = async (req,res) => {
     }
 }
 
-export const update = async (req,res) => {
-    try{
-        const oldFood = await prisma.food.findUnique({
-            where:{
-                id:req.body.id
-            }
-        })
+export const update = async (req, res) => {
+  try {
+    const oldFood = await prisma.food.findUnique({
+      where: { id: req.body.id }
+    })
 
-        if(oldFood.img != ""){
-            if(req.body.img != ""){
-                fs.unlinkSync("uploads/" + oldFood.img)
-            }
-        }
-
-        await prisma.food.update({
-            where:{
-                id:req.body.id
-            },
-            data:{
-                foodTypeId:req.body.foodTypeId,
-                name:req.body.name,
-                remark:req.body.remark,
-                price:req.body.price,
-                img:req.body.img,
-                foodType:req.body.foodType
-            }
-        })
-        res.status(201).json({message:'แก้ไขข้อมูลสำเร็จ'})
-    }catch(error){
-        console.log(error)
-        res.status(500).json({error:'Server Error'})
+    if (!oldFood) {
+      return res.status(404).json({ message: "ไม่พบข้อมูลอาหาร" })
     }
+
+    // ถ้ามีรูปเก่า และมีการส่งรูปใหม่มา
+    if (oldFood.img && req.body.img) {
+      const oldPath = `uploads/${oldFood.img}`
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath)
+      }
+    }
+
+    await prisma.food.update({
+      where: { id: req.body.id },
+      data: {
+        foodTypeId: req.body.foodTypeId,
+        name: req.body.name,
+        remark: req.body.remark,
+        price: req.body.price,
+        img: req.body.img ? req.body.img : oldFood.img,
+        foodType: req.body.foodType
+      }
+    })
+
+    res.status(201).json({ message: "แก้ไขข้อมูลสำเร็จ" })
+
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: "Server Error" })
+  }
 }
+
 
 export const filter = async (req,res) => {
     try{

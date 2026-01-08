@@ -8,7 +8,7 @@ const Layout = ({
 
 
     return (
-        <div className="h-screen bg-linear-to-br from-zinc-800 to-zinc-950 p-3 flex gap-3">
+        <div className="min-h-screen bg-linear-to-tr from-zinc-800 to-zinc-950 p-3 flex gap-3">
            <div className="w-2/12 fixed top-3 left-0 right-0 bottom-2">
             <Sidebar/>
            </div>

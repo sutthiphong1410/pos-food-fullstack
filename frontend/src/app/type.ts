@@ -2,7 +2,7 @@ export interface FoodType {
   id: number;
   name: string;
   remark: string;
-  status: string; 
+  status: string;
 }
 
 export interface FoodSize {
@@ -12,7 +12,7 @@ export interface FoodSize {
   name: string;
   moneyAdded: number;
   remark: string;
-  status: string; 
+  status: string;
 }
 
 export interface Taste {
@@ -21,7 +21,7 @@ export interface Taste {
   FoodType?: FoodType;
   name: string;
   remark: string;
-  status: string; 
+  status: string;
 }
 
 export interface Food {
@@ -34,4 +34,26 @@ export interface Food {
   foodTypeId: number;
   foodType: string;
   FoodType?: FoodType;
+}
+
+export interface SaleTemp {
+  id: number;
+  userId: number;
+  tableNo: number;
+  foodId: number;
+  qty: number;
+  SaleTempdetails: SaleTempDetail[];
+  Food: Food
+}
+
+export interface SaleTempDetail {
+  id: number;
+  saleTempId: number;
+  foodId: number;
+  tasteId: number;
+  foodSizeId: number;
+  Food: Food;
+  Taste: Taste;
+  FoodSize: FoodSize;
+  SaleTemp?: SaleTemp;
 }

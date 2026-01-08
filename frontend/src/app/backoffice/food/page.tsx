@@ -263,7 +263,7 @@ const Page = () => {
                 </div>
             </div>
 
-            <Modal open={open} onClose={closeModal} title="ขนาดอาหาร/เครื่องดื่ม">
+            <Modal open={open} onClose={closeModal} modalSize="max-w-xl" title="ขนาดอาหาร/เครื่องดื่ม">
                 <div className="space-y-3">
                     <select className="w-full rounded-lg bg-zinc-800 border border-zinc-700 px-3 py-2 text-white" value={foodTypeId} onChange={e=>setFoodTypeId(parseInt(e.target.value))} >
                         <option value="">เลือกประเภทอาหาร/เครื่องดื่ม</option>
