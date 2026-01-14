@@ -1,3 +1,12 @@
+export interface User {
+  id: number;
+  name: string;
+  username: string;
+  password: string;
+  level: string;
+  status: string;
+  BillSales?: BillSale[];
+}
 export interface FoodType {
   id: number;
   name: string;
@@ -43,7 +52,7 @@ export interface SaleTemp {
   foodId: number;
   qty: number;
   SaleTempdetails: SaleTempDetail[];
-  Food: Food
+  Food: Food;
 }
 
 export interface SaleTempDetail {
@@ -56,4 +65,33 @@ export interface SaleTempDetail {
   Taste: Taste;
   FoodSize: FoodSize;
   SaleTemp?: SaleTemp;
+}
+
+export interface BillSale {
+  id: number;
+  createDate: Date;
+  payDate: Date;
+  amount: number;
+  payType: string;
+  userId: number;
+  inputMoney: number;
+  returnMoney: number;
+  tableNo: number;
+  status: string;
+  User?: User;
+  billSaleDetails: BillSaleDetail[];
+}
+
+export interface BillSaleDetail {
+  id: number;
+  billSaleId: number;
+  foodId: number;
+  foodSizeId: number;
+  tasteId: number;
+  moneyAdded: number;
+  price: number;
+  Food: Food;
+  FoodSize?: FoodSize;
+  Taste?: Taste;
+  BillSale?: BillSale;
 }

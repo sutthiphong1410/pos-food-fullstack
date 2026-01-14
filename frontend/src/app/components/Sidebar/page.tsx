@@ -47,6 +47,10 @@ export default function Page() {
           <Link href="/backoffice/taste"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-file-alt"></i> รสชาติอาหาร</li></Link>
           <Link href="/backoffice/food"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-utensils"></i> อาหาร</li></Link>
           <Link href="/backoffice/sale"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-dollar-sign"></i> ขายสินค้า</li></Link>
+          <Link href="/backoffice/organization"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-building"></i> ข้อมูลร้าน</li></Link>
+          <Link href="/backoffice/report-bill-sale"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-file-alt"></i> รายงานการขาย</li></Link>
+          <Link href="/backoffice/report-sum-sale-per-day"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-calendar"></i> สรุปยอดขายตามวัน</li></Link>
+          <Link href="/backoffice/report-sum-sale-per-month"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-calendar"></i> สรุปยอดขายตามเดือน</li></Link>
         </ul>
       </div>
     </div>

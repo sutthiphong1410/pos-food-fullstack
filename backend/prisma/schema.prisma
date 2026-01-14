@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  password String
-  name     String
-  level    String @default("admin")
-  status   String @default("use")
+  id        Int        @id @default(autoincrement())
+  username  String     @unique
+  password  String
+  name      String
+  level     String     @default("admin")
+  status    String     @default("use")
+  billSales BillSale[]
 }
 
 model FoodType {
@@ -33,58 +34,102 @@ model FoodType {
 }
 
 model FoodSize {
-  id         Int      @id @default(autoincrement())
-  name       String
-  remark     String
-  foodTypeId Int
-  moneyAdded Int
-  status     String   @default("use")
-  FoodType   FoodType @relation(fields: [foodTypeId], references: [id])
+  id              Int              @id @default(autoincrement())
+  name            String
+  remark          String
+  foodTypeId      Int
+  moneyAdded      Int
+  status          String           @default("use")
+  FoodType        FoodType         @relation(fields: [foodTypeId], references: [id])
   SaleTempdetails SaleTempDetail[]
+  BillSaleDetails BillSaleDetail[]
 }
 
 model Taste {
-  id         Int      @id @default(autoincrement())
-  name       String
-  remark     String
-  status     String   @default("use")
-  foodTypeId Int
-  FoodType   FoodType @relation(fields: [foodTypeId], references: [id])
+  id              Int              @id @default(autoincrement())
+  name            String
+  remark          String
+  status          String           @default("use")
+  foodTypeId      Int
+  FoodType        FoodType         @relation(fields: [foodTypeId], references: [id])
   SaleTempdetails SaleTempDetail[]
+  BillSaleDetails BillSaleDetail[]
 }
 
 model Food {
-  id         Int      @id @default(autoincrement())
-  name       String
-  img        String
-  remark     String
-  status     String   @default("use")
-  price      Int
-  foodType   String   @default("food")
-  foodTypeId Int
-  FoodType   FoodType @relation(fields: [foodTypeId], references: [id])
+  id              Int              @id @default(autoincrement())
+  name            String
+  img             String
+  remark          String
+  status          String           @default("use")
+  price           Int
+  foodType        String           @default("food")
+  foodTypeId      Int
+  FoodType        FoodType         @relation(fields: [foodTypeId], references: [id])
   SaleTempdetails SaleTempDetail[]
-  SaleTemp SaleTemp[]
+  SaleTemp        SaleTemp[]
+  billSaleDetails BillSaleDetail[]
 }
 
 model SaleTemp {
-  id      Int    @id @default(autoincrement())
-  userId  Int
-  tableNo Int
-  foodId Int
-  qty Int
+  id              Int              @id @default(autoincrement())
+  userId          Int
+  tableNo         Int
+  foodId          Int
+  qty             Int
   SaleTempdetails SaleTempDetail[]
-  Food Food @relation(fields: [foodId], references: [id])
+  Food            Food             @relation(fields: [foodId], references: [id])
 }
 
 model SaleTempDetail {
-  id Int @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   saleTempId Int
-  foodId Int
-  tasteId Int?
+  foodId     Int
+  tasteId    Int?
   foodSizeId Int?
-  Food Food @relation(fields: [foodId], references: [id])
-  Taste Taste? @relation(fields: [tasteId], references: [id])
-  FoodSize FoodSize? @relation(fields: [foodSizeId], references: [id])
-  SaleTemp SaleTemp @relation(fields: [saleTempId], references: [id])
+  Food       Food      @relation(fields: [foodId], references: [id])
+  Taste      Taste?    @relation(fields: [tasteId], references: [id])
+  FoodSize   FoodSize? @relation(fields: [foodSizeId], references: [id])
+  SaleTemp   SaleTemp  @relation(fields: [saleTempId], references: [id])
+}
+
+model Organization {
+  id       Int    @id @default(autoincrement())
+  name     String
+  phone    String
+  address  String
+  email    String
+  website  String
+  promtpay String
+  logo     String
+  taxCode  String
+}
+
+model BillSale {
+  id              Int              @id @default(autoincrement())
+  createDate      DateTime         @default(now())
+  payDate         DateTime         @default(now())
+  amount          Int
+  payType         String
+  userId          Int
+  inputMoney      Int
+  returnMoney     Int
+  tableNo         Int
+  status          String           @default("use")
+  User            User             @relation(fields: [userId], references: [id])
+  billSaleDetails BillSaleDetail[]
+}
+
+model BillSaleDetail {
+  id         Int      @id @default(autoincrement())
+  billSaleId Int
+  foodId     Int
+  foodSizeId Int?
+  tasteId    Int?
+  moneyAdded Int?
+  price      Int?
+  BillSale   BillSale @relation(fields: [billSaleId], references: [id])
+  Food       Food     @relation(fields: [foodId], references: [id])
+  FoodSize   FoodSize? @relation(fields: [foodSizeId], references: [id])
+  Taste      Taste?   @relation(fields: [tasteId], references: [id])
 }
