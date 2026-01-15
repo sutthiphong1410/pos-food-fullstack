@@ -1,16 +1,44 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import axios from "axios";
 
 export default function Page() {
-  const [name] = useState(() => {
+  const [name,setName] = useState(() => {
     if (typeof window === "undefined") return "";
     return localStorage.getItem("food_name") || " ";
   });
   const router = useRouter();
+  const [userLevel, setUserLevel] = useState<string>("");
+
+  useEffect(()=>{
+    const name = localStorage.getItem("food_name") || "";
+    setName(name);
+
+    getUserLevel();
+  }, [])
+
+  const getUserLevel = async () => {
+    try{
+      const token = localStorage.getItem("token") || "";
+      const headers = {
+          'Authorization': `Bearer ${token}`
+      }
+      const res = await axios.get("http://localhost:3001/api/user/getLevelByToken", { headers });
+      setUserLevel(res.data.level);
+
+    }catch (error: unknown) {
+      if(axios.isAxiosError(error)){
+          toast.error(error.response?.data.message || "เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้งาน"),
+          {autoClose: 2000}
+      }else{
+          toast.error("something went wrong", {autoClose: 2000});
+      }
+    }
+  }
 
   const logout = async () => {
     try{
@@ -42,15 +70,23 @@ export default function Page() {
       </div>
       <div className="pl-7 font-light px-4">
         <ul>
-          <Link href="/backoffice/foodType"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-th"></i> ประเภทอาหาร</li></Link>
+         {userLevel === "admin" && (
+           <Link href="/backoffice/dashboard"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-tachometer-alt"></i> Dashboard</li></Link>)}
+
+         {userLevel === "admin" || userLevel === "user" && (
+           <Link href="/backoffice/sale"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-dollar-sign"></i> ขายสินค้า</li></Link>)}
+          {userLevel === "admin" && (
+          <>
+              <Link href="/backoffice/foodType"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-th"></i> ประเภทอาหาร</li></Link>
           <Link href="/backoffice/foodSize"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-list"></i> ขนาดอาหาร</li></Link>
           <Link href="/backoffice/taste"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-file-alt"></i> รสชาติอาหาร</li></Link>
           <Link href="/backoffice/food"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-utensils"></i> อาหาร</li></Link>
-          <Link href="/backoffice/sale"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-dollar-sign"></i> ขายสินค้า</li></Link>
+          <Link href="/backoffice/user"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-users"></i> ผู้ใช้งาน</li></Link>
           <Link href="/backoffice/organization"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-building"></i> ข้อมูลร้าน</li></Link>
           <Link href="/backoffice/report-bill-sale"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-file-alt"></i> รายงานการขาย</li></Link>
           <Link href="/backoffice/report-sum-sale-per-day"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-calendar"></i> สรุปยอดขายตามวัน</li></Link>
           <Link href="/backoffice/report-sum-sale-per-month"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-calendar"></i> สรุปยอดขายตามเดือน</li></Link>
+          </>)}
         </ul>
       </div>
     </div>

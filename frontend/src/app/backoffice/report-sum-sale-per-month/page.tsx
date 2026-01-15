@@ -23,7 +23,12 @@ const Page = () => {
             const payload = {
                 year: selectYear
             }
-            const res = await axios.post(config.apiUrl+"/report/sumPerMonthInYear", payload);
+            const token = localStorage.getItem("token") || "";
+
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const res = await axios.post(config.apiUrl+"/report/sumPerMonthInYear", payload, { headers });
             setData(res.data);
             setTotalAmount(sumTotalAmount(res.data));
         }catch (error: unknown) {

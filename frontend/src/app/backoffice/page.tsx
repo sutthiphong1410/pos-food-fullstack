@@ -1,9 +1,10 @@
 'use client'
+import Dashboard from "./dashboard/page";
 
 const Page = () => {
     return (
         <>
-           ssssss
+           <Dashboard/>
         </>
     )
 }
