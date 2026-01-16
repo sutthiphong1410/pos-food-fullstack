@@ -150,39 +150,39 @@ const Page = () => {
                 <div className="space-y-4">
                     <button 
                     onClick={() => { clearForm(); openModal(); }}
-                    className="px-4 py-2 rounded-3xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer">
+                    className="btn-add">
                     <i className="fa fa-plus me-2"></i>เพิ่มรายการ
                     </button>
 
                     <div>
-                        <table className="w-full border-collapse rounded-xl overflow-hidden">
-                            <thead className="bg-zinc-800 text-zinc-300">
+                        <table className="table">
+                            <thead className="">
                                 <tr>
-                                    <th className="px-4 py-3 text-left">ชื่อประเภทอาหาร/เครื่องดื่ม</th>
-                                    <th className="px-4 py-3 text-left">รสชาติอาหาร</th>
-                                    <th className="px-4 py-3 ">หมายเหตุ</th>
-                                    <th className="px-4 py-3 text-center">จัดการ</th>
+                                    <th className="text-left">ชื่อประเภทอาหาร/เครื่องดื่ม</th>
+                                    <th className="text-left">รสชาติอาหาร</th>
+                                    <th className="text-left">หมายเหตุ</th>
+                                    <th className="text-center">จัดการ</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-800 bg-zinc-900">
+                            <tbody>
                                 {tastes.length > 0 ? (
                                     tastes.map((item: Taste) => (
-                                    <tr key={item.id} className="hover:bg-zinc-600 bg-zinc-700">
-                                        <td className="px-4 py-3">{item.FoodType?.name || "-"}</td>
-                                        <td className="px-4 py-3">{item.name}</td>
-                                        <td className="px-4 py-3 text-zinc-400">
+                                    <tr key={item.id} >
+                                        <td >{item.FoodType?.name || "-"}</td>
+                                        <td >{item.name}</td>
+                                        <td >
                                             {item.remark || "-"}
                                         </td>
-                                        <td className="px-4 py-3 text-center">
+                                        <td >
                                             <div className="flex justify-center gap-2">
                                                 <button
-                                                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-3xl cursor-pointer"
+                                                  className="btn-edit"
                                                   onClick={() => handleEdit(item)}
                                                 >
                                                   แก้ไข
                                                 </button>
                                                 <button
-                                                  className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-3xl cursor-pointer"
+                                                  className="btn-delete"
                                                   onClick={(e) => handleRemove(item)}
                                                 >
                                                   ลบ

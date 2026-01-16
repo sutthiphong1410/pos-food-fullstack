@@ -163,9 +163,9 @@ const Page = () => {
 
                 <div className="flex items-center gap-4 space-y-4">
                                <div className="flex flex-col ">
-                                    <label className="text-sm font-semibold text-gray-300">ปี</label>
+                                    <label className="text-[15px] md:text-sm font-semibold text-gray-300">ปี</label>
                                      <select value={selectedYear} onChange={e=>setSelectedYear(parseInt(e.target.value))}
-                                     className="px-4 py-2 cursor-pointer rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                                     className="md:px-4 md:py-2 cursor-pointer rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
                                         {years.map((year) => (
                                             <option 
                                             key={year} 
@@ -178,9 +178,9 @@ const Page = () => {
                                </div>
                
                                  <div className="flex flex-col ">
-                                      <label className="text-sm font-semibold text-gray-300">เดือน</label>
+                                      <label className="text-[15px] md:text-sm font-semibold text-gray-300">เดือน</label>
                                      <select value={month} onChange={e=>setMonth(parseInt(e.target.value))}
-                                     className="px-4 py-2 cursor-pointer rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                                     className="md:px-4 md:py-2 cursor-pointer rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
                                         {monthNames.map((monthName, index) => (
                                             <option 
                                             key={index} 
@@ -194,19 +194,20 @@ const Page = () => {
                                
                                <button
                                onClick={fetchData}
-                               className="px-4 py-2 rounded-3xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
+                               className="px-4 py-1 md:py-2 rounded-3xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
                                >
-                               <i className="fa fa-search me-2"></i>แสดงรายงาน
+                               <i className="fa fa-search md:me-2"></i>
+                               <p className="hidden md:inline">แสดงรายงาน</p>
                                </button>
                 </div>
 
                 <div>
-                    <h3 className="text-xl">สรุปยอดขายตามวัน</h3>
+                    <h3 className="md:text-xl">สรุปยอดขายรายวัน</h3>
                     <canvas id="chartPerDay" height={120}></canvas>
                 </div>
 
                 <div>
-                    <h3 className="text-xl">สรุปยอดขายตามเดือน</h3>
+                    <h3 className="md:text-xl">สรุปยอดขายรายเดือน</h3>
                     <canvas id="chartPerMonth" height={120}></canvas>
                 </div>
             </div>

@@ -138,35 +138,35 @@ const Page = () => {
                 <div className="space-y-4">
                     <button 
                     onClick={() => { handleClearForm(); openModal(); }}
-                    className="px-4 py-2 rounded-3xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer">
+                    className="btn-add">
                     <i className="fa fa-plus me-2"></i>เพิ่มรายการ
                     </button>
                 </div>
 
-                <table className="w-full border-collapse rounded-xl overflow-hidden">
-                            <thead className="bg-zinc-800 text-zinc-300">
+                <table className="table">
+                            <thead >
                                 <tr>
-                                    <th className="px-4 py-3 text-left">ชื่อ</th>
-                                    <th className="px-4 py-3 text-left">username</th>
-                                    <th className="px-4 py-3 ">ระดับผู้ใช้งาน</th>
-                                    <th className="px-4 py-3 text-center">จัดการ</th>
+                                    <th className="text-left">ชื่อ</th>
+                                    <th className="text-left">username</th>
+                                    <th>ระดับผู้ใช้งาน</th>
+                                    <th className="text-center">จัดการ</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-800 bg-zinc-900">
+                            <tbody>
                                 {users.map((item:User) => (
                                     <tr key={item.id} className={item.id === currentUserId ? "bg-zinc-700" : ""}>
-                                        <td className="px-4 py-3">{item.name}</td>
-                                        <td className="px-4 py-3">{item.username}</td>
-                                        <td className="px-4 py-3 text-center">{item.level}</td>
-                                        <td className="px-4 py-3 text-center space-x-2">
+                                        <td>{item.name}</td>
+                                        <td>{item.username}</td>
+                                        <td className="text-center">{item.level}</td>
+                                        <td className="flex justify-center text-center gap-1">
                                             <button 
                                             onClick={() => handleEdit(item.id)}
-                                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-3xl cursor-pointer">
+                                            className="btn-edit">
                                              แก้ไข
                                             </button>
                                             <button
                                             onClick={() => handleDelete(item.id)}
-                                            className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-3xl cursor-pointer">
+                                            className="btn-delete">
                                              ลบ
                                             </button>
                                         </td>

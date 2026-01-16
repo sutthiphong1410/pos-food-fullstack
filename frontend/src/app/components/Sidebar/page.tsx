@@ -6,7 +6,11 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import axios from "axios";
 
-export default function Page() {
+type SidebarProps = {
+  onSelect?: () => void;
+};
+
+export default function Page({ onSelect }: SidebarProps) {
   const [name,setName] = useState(() => {
     if (typeof window === "undefined") return "";
     return localStorage.getItem("food_name") || " ";
@@ -61,7 +65,7 @@ export default function Page() {
   }
 
   return (
-    <div className="shadow-xl bg-zinc-900  h-full rounded-xl text-white">
+    <div className="shadow-xl bg-zinc-900  h-full rounded-xl text-white overflow-y-auto">
       <div className="py-8 flex flex-col items-center justify-center space-y-2">
         <div>logo</div>
         <h3 className="text-lg">{name}</h3>
@@ -71,21 +75,21 @@ export default function Page() {
       <div className="pl-7 font-light px-4">
         <ul>
          {userLevel === "admin" && (
-           <Link href="/backoffice/dashboard"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-tachometer-alt"></i> Dashboard</li></Link>)}
+           <Link href="/backoffice/dashboard" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-tachometer-alt"></i> Dashboard</li></Link>)}
 
-         {userLevel === "admin" || userLevel === "user" && (
-           <Link href="/backoffice/sale"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-dollar-sign"></i> ขายสินค้า</li></Link>)}
+         
+           <Link href="/backoffice/sale" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-dollar-sign"></i> ขายสินค้า</li></Link>
           {userLevel === "admin" && (
           <>
-              <Link href="/backoffice/foodType"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-th"></i> ประเภทอาหาร</li></Link>
-          <Link href="/backoffice/foodSize"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-list"></i> ขนาดอาหาร</li></Link>
-          <Link href="/backoffice/taste"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-file-alt"></i> รสชาติอาหาร</li></Link>
-          <Link href="/backoffice/food"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-utensils"></i> อาหาร</li></Link>
-          <Link href="/backoffice/user"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-users"></i> ผู้ใช้งาน</li></Link>
-          <Link href="/backoffice/organization"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-building"></i> ข้อมูลร้าน</li></Link>
-          <Link href="/backoffice/report-bill-sale"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-file-alt"></i> รายงานการขาย</li></Link>
-          <Link href="/backoffice/report-sum-sale-per-day"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-calendar"></i> สรุปยอดขายตามวัน</li></Link>
-          <Link href="/backoffice/report-sum-sale-per-month"><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-calendar"></i> สรุปยอดขายตามเดือน</li></Link>
+              <Link href="/backoffice/foodType" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-th"></i> ประเภทอาหาร</li></Link>
+          <Link href="/backoffice/foodSize" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-list"></i> ขนาดอาหาร</li></Link>
+          <Link href="/backoffice/taste" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-file-alt"></i> รสชาติอาหาร</li></Link>
+          <Link href="/backoffice/food" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-utensils"></i> อาหาร</li></Link>
+          <Link href="/backoffice/user" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-users"></i> ผู้ใช้งาน</li></Link>
+          <Link href="/backoffice/organization" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-building"></i> ข้อมูลร้าน</li></Link>
+          <Link href="/backoffice/report-bill-sale" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-file-alt"></i> รายงานการขาย</li></Link>
+          <Link href="/backoffice/report-sum-sale-per-day" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-calendar"></i> สรุปยอดขายตามวัน</li></Link>
+          <Link href="/backoffice/report-sum-sale-per-month" onClick={onSelect}><li className="hover:bg-zinc-800 rounded-lg p-2 cursor-pointer"><i className="fa-solid fa-calendar"></i> สรุปยอดขายตามเดือน</li></Link>
           </>)}
         </ul>
       </div>

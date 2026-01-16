@@ -43,23 +43,23 @@ const Page = () => {
   };
   return (
     <div className="w-screen bg-linear-to-br from-zinc-900 to-zinc-950">
-      <div className="flex flex-col py-15 items-center  min-h-screen ">
-        <div className="bg-zinc-900 rounded-lg shadow-md w-10/12 space-y-18 ">
+      <div className="flex flex-col py-8 md:py-15 items-center justify-center  min-h-screen ">
+        <div className="bg-zinc-900 rounded-lg  shadow-md w-10/12 md:space-y-18 ">
 
         
-        <div className="flex justify-center items-start pt-5  ">
-          <Image src={logo} alt="Logo" width={150} height={150} />
+        <div className="flex justify-center items-start pt-5 ">
+          <Image src={logo} alt="Logo" className="w-[125px] h-[125px] md:h-[150px] md:w-[150px]" />
         </div>
 
             <div className="flex flex-col justify-center items-center space-y-4">
             
-              <h2 className="text-3xl text-center mb-4 font-semibold">เข้าสู่ระบบ</h2>
+              <h2 className="text-lg md:text-3xl text-center mb-4 font-semibold">เข้าสู่ระบบ</h2>
               <p className="text-center mb-4 font-light text-gray-500">Welcome back to Admin</p>
 
               <div className="">
                 <input
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full font-light pr-40 py-2 border-b focus:outline-0"
+                  className="w-full font-light md:pr-40 py-2 border-b focus:outline-0"
                   placeholder="Username"
                 />
               </div>
@@ -68,14 +68,14 @@ const Page = () => {
 
                   type="password"
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full font-light pr-40 py-2 border-b focus:outline-0"
+                  className="w-full font-light md:pr-40 py-2 border-b focus:outline-0"
                   placeholder="Password"
                 />
               </div>
               <div className="flex justify-center items-center  py-2">
                 <button
                   onClick={login}
-                  className="font-light rounded-3xl cursor-pointer px-18 bg-emerald-500 text-black py-2 hover:bg-emerald-600 transition duration-300"
+                  className="font-light rounded-3xl cursor-pointer px-4 md:px-18 bg-emerald-500 text-black py-2 hover:bg-emerald-600 transition duration-300"
                 >
                   เข้าสู่ระบบ
                 </button>
