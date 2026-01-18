@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 
 const Page = () => {
     const [open, setOpen] = useState(false);
+    const [openMore, setOpenMore] = useState(false);
     const [foodTypeId, setFoodTypeId] = useState(0);
     const [foodTypes, setFoodTypes] = useState<FoodType[]>([]);
     const [foods, setFoods] = useState([])
@@ -21,6 +22,7 @@ const Page = () => {
     const [fileName, setFileName] = useState("เลือกไฟล์รูปภาพ");
     const [myFile, setMyFile] = useState<File | null>(null);
     const [foodType, setFoodType] = useState("food");
+    const [categoryName, setCategoryName] = useState("");
 
     useEffect(() => {
         fetchDataFoodTypes();
@@ -168,7 +170,6 @@ const Page = () => {
         setFoodTypeId(item.foodTypeId)
         setName(item.name)
         setPrice(item.price)
-        setFoodType(item.foodType)
         setImg(item.img)
         setRemark(item.remark)
         openModal()
@@ -182,6 +183,22 @@ const Page = () => {
         setOpen(false);
     }
 
+    const openModalMore = (item: Food) => {
+        setId(item.id)
+        setFoodTypeId(item.foodTypeId)
+        setName(item.name)
+        setPrice(item.price)
+        setImg(item.img)
+        setRemark(item.remark)
+        setCategoryName(item.FoodType ? item.FoodType.name : '')
+        setOpenMore(true);
+        
+    }
+
+    const closeModalMore = () => {
+        setOpenMore(false);
+    }
+
     const clearForm = () => {
         setId(0)
         setFoodTypeId(0)
@@ -192,6 +209,7 @@ const Page = () => {
         setImg("")
         setRemark("")
     }
+
 
     return (
         <>
@@ -207,11 +225,11 @@ const Page = () => {
                         <thead >
                         <tr>
                             <th className="text-left">ภาพ</th>
-                            <th className="text-left">ประเภท</th>
-                            <th className="text-left">ชนิด</th>
+                            <th className="text-left hidden md:table-cell">ประเภท</th>
+                            <th className="text-left hidden md:table-cell ">ชนิด</th>
                             <th className="text-left">ชื่ออาหาร</th>
-                            <th className="text-left">หมายเหตุ</th>
-                            <th className="text-end">ราคา</th>
+                            <th className="text-left  hidden md:table-cell ">หมายเหตุ</th>
+                            <th className="text-right">ราคา</th>
                             <th className="text-center">จัดการ</th>
                         </tr>
                         </thead>
@@ -222,15 +240,15 @@ const Page = () => {
                                             <td >
                                                 <img className="rounded-xl" src={config.pathImg+'/uploads/' + item.img} alt={item.name} width="150" />
                                             </td>
-                                                <td >{item.FoodType?.name}</td>
-                                                <td >{getFoodTypeName(item.foodType)}</td>
+                                                <td className="hidden md:table-cell ">{item.FoodType?.name}</td>
+                                                <td className="hidden md:table-cell ">{getFoodTypeName(item.foodType)}</td>
                                                 <td >
                                                     {item.name}
                                                 </td>
-                                                <td >
+                                                <td className="hidden md:table-cell ">
                                                     {item.remark}
                                                 </td>
-                                                 <td >
+                                                 <td className="text-right">
                                                     {item.price}
                                                 </td>
                                                 <td >
@@ -246,6 +264,12 @@ const Page = () => {
                                                         onClick={(e) => handleRemove(item)}
                                                         >
                                                         ลบ
+                                                        </button>
+                                                        <button
+                                                        className="md:hidden text-[15px] px-1 bg-blue-600 hover:bg-blue-500 text-white rounded-xl cursor-pointer"
+                                                        onClick={e=>openModalMore(item)}
+                                                        >
+                                                        รายละเอียด
                                                         </button>
                                                     </div>
                                                     </td>
@@ -311,7 +335,7 @@ const Page = () => {
                     />
 
                    <div className="flex space-x-4">
-                    <div>ประเภท</div>
+                    <div>ชนิด </div>
 
                     <label className="flex items-center gap-1 cursor-pointer">
                         <input
@@ -349,6 +373,27 @@ const Page = () => {
                     </div>
                 </div>
             </Modal>
+
+            <Modal open={openMore} onClose={closeModalMore} title="รายละเอียดอาหาร/เครื่องดื่ม">
+                <div className="space-y-3">
+                    <div className="flex justify-center">
+                        {img != '' &&
+                            <img className="rounded-2xl w-[200px]" src={config.pathImg+'/uploads/'+img} alt={name}  />
+                        }
+                    </div>
+                    <div><strong>ชื่ออาหาร/เครื่องดื่ม :</strong> {name}</div>
+                    <div><strong>ราคา :</strong> {price} บาท</div>
+                    <div><strong>ชนิด :</strong> {getFoodTypeName(foodType)}</div>
+                    <div><strong>ประเภท :</strong>{categoryName}</div>
+                    <div><strong>หมายเหตุ :</strong> {remark}</div>
+                    <div className="text-center">
+                        <button onClick={closeModalMore} className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-2xl">ปิด</button>
+                    </div>
+                    
+                </div>
+            </Modal>
+
+            
         </>
     )
 }

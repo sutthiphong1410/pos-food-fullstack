@@ -56,9 +56,9 @@ const Page = () => {
                 <hr className="border-1 border-emerald-500"/>
                    <div className="flex items-center gap-4 space-y-4">
                                <div className="flex flex-col ">
-                                    <label className="text-sm font-semibold text-gray-300">ปี</label>
+                                    <label className="text-[15px] md:text-sm font-semibold text-gray-300">ปี</label>
                                      <select value={selectYear} onChange={e=>setSelectYear(parseInt(e.target.value))}
-                                     className="px-4 py-2 cursor-pointer rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                                     className="md:px-4 md:py-2 cursor-pointer rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
                                         {arrYear.map((year) => (
                                             <option 
                                             key={year} 
@@ -70,39 +70,40 @@ const Page = () => {
                                      </select>
                                </div>
                                
-                               <button
+                                 <button
                                onClick={fetchData}
-                               className="px-4 py-2 rounded-3xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
+                               className="px-4 py-1 md:py-2 rounded-3xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
                                >
-                               <i className="fa fa-search me-2"></i>แสดงรายงาน
+                               <i className="fa fa-search md:me-2"></i>
+                               <p className="hidden md:inline">แสดงรายงาน</p>
                                </button>
                     </div>
 
-                    <table className="w-full border-collapse rounded-xl overflow-hidden">
-                        <thead className="bg-zinc-800 text-zinc-300">
+                    <table className="table">
+                        <thead >
                             <tr>
-                                <th className="px-4 py-3 text-start">เดือน</th>
-                                <th className="px-4 py-3 text-end w-[150px]">ยอดขายรวม</th>
+                                <th className="text-start">เดือน</th>
+                                <th className="text-end w-[150px]">ยอดขายรวม</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-800 bg-zinc-900">
+                        <tbody >
                             {data.length > 0 ? (
                                 data.map((item: any) => (
-                                    <tr key={item.id} className="hover:bg-zinc-600 bg-zinc-700">
-                                        <td className="px-4 py-3 text-start">{dayjs(item.month).format('MM')}</td>
-                                        <td className="px-4 py-3 text-end">{item.amount.toLocaleString('th-TH')}</td>
+                                    <tr key={item.id} >
+                                        <td className="text-start">{dayjs(item.month).format('MM')}</td>
+                                        <td className="text-end">{item.amount.toLocaleString('th-TH')}</td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={2} className="px-4 py-3 text-center">ไม่มีข้อมูลรายงาน</td>
+                                    <td colSpan={2} className="text-center">ไม่มีข้อมูลรายงาน</td>
                                 </tr>
                             )}
                         </tbody>
                         <tfoot className="bg-zinc-800 text-zinc-300">
                             <tr>
-                                <th className="px-4 py-3 text-end">รวมยอดขายทั้งหมด</th>
-                                <th className="px-4 py-3 text-end">{totalAmount.toLocaleString('th-TH')}</th>
+                                <th className="px-1 py-2 md:px-4 md:py-3 text-end text-[10px] md:text-base">รวมยอดขายทั้งหมด</th>
+                                <th className="px-1 py-2 md:px-4 md:py-3 text-end text-[10px] md:text-base">{totalAmount.toLocaleString('th-TH')}</th>
                             </tr>
                         </tfoot>
                     </table>

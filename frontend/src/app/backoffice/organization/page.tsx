@@ -182,13 +182,13 @@ const Page = () => {
                         <input 
                             type="file" 
                             onChange={handleFileChange}
-                            className="py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-600 file:text-white file:cursor-pointer"
+                            className="py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition file:mr-2 md:file:py-2 file:px-2 md:file:px-4 file:rounded-lg file:border-0 file:bg-emerald-600 file:text-white file:cursor-pointer"
                         />
                     </div>
               
                     </div>
                      <div className="">
-                        <button onClick={save} className="px-8 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition duration-200 transform hover:scale-105 shadow-lg cursor-pointer">
+                        <button onClick={save} className="py-1 px-1 md:px-8 md:py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition duration-200 transform hover:scale-105 shadow-lg cursor-pointer">
                             บันทึกข้อมูล
                         </button>
                     </div>

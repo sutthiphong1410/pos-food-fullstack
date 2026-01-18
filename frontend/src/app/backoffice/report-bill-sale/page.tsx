@@ -97,68 +97,73 @@ const Page = () => {
           <div className="space-y-4">
             <h3 className="font-bold">รายงานการขาย</h3>
             <hr className="border-1 border-emerald-500"/>
-            <div className="flex items-center gap-4 space-y-4">
+
+
+            <div className="md:flex justify-center md:justify-start items-center gap-4 space-y-4">
                 <div className="flex flex-col ">
-                     <label className="text-sm font-semibold text-gray-300">จากวันที่</label>
+                     <label className="text-[15px] md:text-sm font-semibold text-gray-300">จากวันที่</label>
                         <input 
                             value={dayjs(fromDate).format('YYYY-MM-DD')}
                             onChange={(e) => setFromDate(new Date(e.target.value))}
                             type="date"  
-                            className="px-4 py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                            className="md:px-4 md:py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                     />
                 </div>
 
-                  <div className="flex flex-col ">
-                     <label className="text-sm font-semibold text-gray-300">ถึงวันที่</label>
+                <div className="flex flex-col ">
+                     <label className="text-[15px] md:text-sm font-semibold text-gray-300">ถึงวันที่</label>
                         <input 
                             value={dayjs(toDate).format('YYYY-MM-DD')}
                             onChange={(e) => setToDate(new Date(e.target.value))}
                             type="date"  
-                            className="px-4 py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                            className="md:px-4 md:py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                     />
                 </div>
                 
-                <button
-                onClick={fetchData}
-                className="px-4 py-2 rounded-3xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
-                >
-                <i className="fa fa-search me-2"></i>แสดงรายงาน
-                </button>
+                <div className="flex justify-center ">
+                    <button
+                    onClick={fetchData}
+                    className="px-4 py-1 md:py-2 rounded-3xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
+                    >
+                        <i className="fa fa-search md:me-2"></i>
+                        แสดงรายงาน
+                 </button>
+                </div>
             </div>
 
-               <table className="w-full border-collapse rounded-xl overflow-hidden">
-                <thead className="bg-zinc-800 text-zinc-300">
+               <table className="table" >
+                <thead>
                   <tr>
-                    <th className="px-4 py-3 text-center w-[300px]"></th>
-                    <th className="px-4 py-3 text-center">วันที่</th>
-                    <th className="px-4 py-3 text-start">รหัสบิล</th>
-                    <th className="px-4 py-3 text-start">พนักงานขาย</th>
-                    <th className="px-4 py-3 text-end">โต๊ะ</th>
-                    <th className="px-4 py-3 text-end">ยอดขาย</th>
+                    <th className="text-center"></th>
+                    <th className="text-center">วันที่</th>
+                    <th className="text-start">รหัสบิล</th>
+                    <th className="text-start">พนักงานขาย</th>
+                    <th className="text-end">โต๊ะ</th>
+                    <th className="text-end">ยอดขาย</th>
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-zinc-800 bg-zinc-900">
+                <tbody>
                     {billSales.length > 0 ? (
                         billSales.map((item: BillSale) => (
-                            <tr key={item.id} className="hover:bg-zinc-600 bg-zinc-700">
-                                <td className="px-4 py-3 text-center space-x-4">
+                            <tr key={item.id}>
+                                <td className="flex-col md:flex-row space-y-2">
                                     <button 
                                         onClick={() => handleRemove(item.id)}
-                                        className="bg-red-500 hover:bg-red-400 text-white px-2 py-1 rounded-lg cursor-pointer">
+                                        className="btn-delete me-0.5">
                                         ยกเลิก
                                     </button>
                                     <button 
                                         onClick={() => openModalBillSale(item.billSaleDetails || [])}
-                                        className="bg-blue-500 hover:bg-blue-400 text-white px-2 py-1 rounded-lg cursor-pointer">
+                                        className="bg-blue-500 hover:bg-blue-400 text-white  md:py-1.5 py-1 md:px-1 rounded-2xl text-[10px] md:text-base cursor-pointer">
                                         รายละเอียด
                                     </button>
                                 </td>
-                                <td className="px-4 py-3 text-center">{dayjs(item.payDate).format('DD-MM-YYYY HH:mm:ss')}</td>
-                                <td className="px-4 py-3 text-start">{item.id}</td>
-                                <td className="px-4 py-3 text-start">{item.User?.name}</td>
-                                <td className="px-4 py-3 text-end">{item.tableNo}</td>
-                                <td className="px-4 py-3 text-end">{item.amount.toFixed(2)}</td>
+                                <td className="text-center">{dayjs(item.payDate).format('DD-MM-YYYY HH:mm:ss')}</td>
+                                <td className="text-start">{item.id}</td>
+                                <td className="text-start">{item.User?.name}</td>
+                                <td className="text-end">{item.tableNo}</td>
+                                <td className="text-end">{item.amount.toFixed(2)}</td>
                             </tr>
                         ))
                     ) : (

@@ -7,10 +7,11 @@ type ModalProps = {
   onClose: () => void;
   title?: string;
   modalSize?: string;
+  zIndex?: number;
   children: ReactNode;
 };
 
-const Modal = ({ open, onClose, title, modalSize = "max-w-md", children }: ModalProps) => {
+const Modal = ({ open, onClose, title, modalSize = "max-w-md", zIndex = 50, children }: ModalProps) => {
   useEffect(() => {
     if (!open) return;
 
@@ -30,6 +31,7 @@ const Modal = ({ open, onClose, title, modalSize = "max-w-md", children }: Modal
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
       onClick={onClose}
+      style={{ zIndex }}
     >
       <div
         className={`relative w-full ${modalSize} rounded-xl bg-zinc-900 shadow-xl p-6`}

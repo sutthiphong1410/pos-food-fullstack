@@ -26,6 +26,7 @@ const Page = () => {
     const [openEdit, setOpenEdit] = useState(false)
     const [openEndSale, setOpenEndSale] = useState(false)
     const [openBill, setOpenBill] = useState(false)
+    const [openCart, setOpenCart] = useState(false)
  
 
     useEffect(()=> {
@@ -60,6 +61,14 @@ const Page = () => {
 
     const closeModalBill = () => {
         setOpenBill(false);
+    }
+
+    const openModalCart = () => {
+        setOpenCart(true);
+    }
+
+    const closeModalCart = () => {
+        setOpenCart(false);
     }
 
 
@@ -502,6 +511,7 @@ const Page = () => {
                 if(res.status == 200){
                     toast.success("จบการขายสำเร็จ",{autoClose:2000})
                     closeModalEndSale()
+                    closeModalCart()
                     fetchDataSaleTemp()
                     setInputMoney(0)
                     printBillAfterPay()
@@ -549,41 +559,66 @@ const Page = () => {
 
     return (
         <div className="flex gap-4">
-        <div className="space-y-4 w-9/12">
-         <h3 className="font-bold">ขายสินค้า</h3>
+        <div className="space-y-4 sm:w-9/12">
+         <h3 className="font-bold ">ขายสินค้า</h3>
          <hr className="border-1 border-emerald-500"/>
-            <div className="flex gap-2">
-               <div className="flex">
+            <div className="md:flex gap-2">
+               <div className="flex sm:h-10">
                     <h3 className="shadow-2xl px-2 py-1 rounded-l-3xl bg-black/20 border border-zinc-700  text-white" >โต๊ะ</h3>
                     <input ref={myRef} value={table} onChange={e=>setTable(parseInt(e.target.value))} type="text" className="border pl-1 rounded-r-3xl focus:outline-none text-sm shadow-2xl px-2 bg-zinc-800  border-zinc-700  text-white" />
                </div>
-               <div className="space-x-2">
-                    <button onClick={e=>filterFood('food')} className="px-2 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
-                            <i className="fa fa-hamburger "></i> อาหาร
+               <div className="max-xs:grid max-xs:grid-cols-3 space-x-2 sm:space-y-1 py-2">
+                    <button onClick={e=>filterFood('food')} className="text-sm md:text-base
+                    sm:px-2 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
+                            <div className="flex max-xs:justify-center items-center gap-1">
+                                <div className="max-xs:hidden">
+                                    <i className="fa fa-hamburger "></i> 
+                                </div>
+                                <p>อาหาร</p>
+                            </div>
                     </button>
 
-                    <button onClick={e=>filterFood('drink')} className="px-2 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
-                            <i className="fa fa-coffee "></i> เครื่องดื่ม
+                    <button onClick={e=>filterFood('drink')} className="text-sm md:text-base
+                    sm:px-2 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
+                            <div className="flex max-xs:justify-center items-center gap-1">
+                                
+                                <div className="max-xs:hidden">
+                                    <i className="fa fa-coffee "></i> 
+                                </div>
+                                <p>เครื่องดื่ม</p>
+                            </div>
                     </button>
 
-                    <button onClick={e=>filterFood('all')} className="px-2 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
-                            <i className="fa fa-list "></i> ทั้งหมด
+                    <button onClick={e=>filterFood('all')} className="text-sm md:text-base
+                    sm:px-2 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
+                            <div className="flex max-xs:justify-center items-center gap-1"> 
+                                <div className="max-xs:hidden">
+                                    <i className="fa fa-list "></i> 
+                                </div>
+                                <p>ทั้งหมด</p>
+                            </div>
                     </button>
-
-                    <button disabled={saleTemp.length === 0} onClick={e=>removeAllSaleTemp()} className=" disabled:bg-zinc-500 px-2 py-1 bg-red-500 hover:bg-red-400 cursor-pointer rounded-3xl">
-                            <i className="fa fa-trash "></i> ล้างรายการ
+                
+                    <button disabled={saleTemp.length === 0} onClick={e=>removeAllSaleTemp()} className="max-xs:hidden text-sm md:text-base
+                     disabled:bg-zinc-500 px-2 py-1 bg-red-500 hover:bg-red-400 cursor-pointer rounded-3xl">
+                         <div className="flex max-xs:justify-center items-center gap-1">
+                            <i className="fa fa-trash "></i>
+                            <p>ล้างรายการ</p>
+                         </div>
                     </button>
                     {amount > 0 ?
-                    <button onClick={e=>printBillBeforePay()} className="px-2 py-1 bg-emerald-500 hover:bg-emerald-400 cursor-pointer rounded-3xl">
+                    <button onClick={e=>printBillBeforePay()} className="max-xs:hidden text-sm md:text-base
+                    px-2 py-1 bg-emerald-500 hover:bg-emerald-400 cursor-pointer rounded-3xl">
                             <i className="fa fa-print "></i> พิมพ์ใบแจ้งรายการ
                     </button>
                     :
-                    <button disabled className="px-2 py-1 bg-gray-500  rounded-3xl">
+                    <button disabled className="max-xs:hidden text-sm md:text-base
+                    px-2 py-1 bg-gray-500  rounded-3xl">
                             <i className="fa fa-print "></i> พิมพ์ใบแจ้งรายการ
                     </button>}
                </div>
             </div>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid max-xs:grid-cols-2 sm:grid-cols-4 gap-4">
                 {foods.map((item: Food) => (
                     <div
                     key={item.id}
@@ -592,11 +627,11 @@ const Page = () => {
                     <img
                         src={`${config.pathImg}/uploads/${item.img}`}
                         alt={item.name}
-                        className="rounded-lg mb-2 w-[200px] h-[190px] mx-auto object-cover "
+                        className="rounded-lg mb-2 w-[150px] h-[100px] md:w-[200px] md:h-[190px] mx-auto object-cover "
                         onClick={e=>sale(item.id)}
                     />
-                    <p className="font-light hover:text-gray-100">{item.name}</p>
-                    <h3 className="text-green-400 hover:text-green-500 font-bold">
+                    <p className="text-sm md:text-base font-light hover:text-gray-100">{item.name}</p>
+                    <h3 className="text-green-400 hover:text-green-500 text-sm md:text-base font-bold">
                         {item.price} บาท
                     </h3>
                     </div>
@@ -604,8 +639,14 @@ const Page = () => {
             </div>
 
         </div>
-        <div className="w-4/12 mt-10 space-y-4 ">
-            <div className="text-end text-4xl w-full bg-black shadow-2xl p-4 rounded-3xl">
+        {saleTemp.length > 0 && (
+            <div onClick={openModalCart} className="fixed sm:hidden bottom-5 right-6 bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-full">
+            <p className="absolute -top-2 -right-2 bg-red-500 px-2 rounded-full">{saleTemp.length}</p>
+            <i className="fa-solid fa-cart-plus"></i>
+        </div>
+        )}
+        <div className="max-xs:hidden w-4/12 mt-10 space-y-4 ">
+            <div className="text-end text-2xl md:text-4xl w-full bg-black shadow-2xl p-2 md:p-4 rounded-3xl">
                 {(amount + amountAdded).toLocaleString("TH-th")+" .-"}
             </div>
 
@@ -622,16 +663,16 @@ const Page = () => {
         }
           {saleTemp.length > 0 ?saleTemp?.map((item:SaleTemp) => (
                 <div key={item.id} className="px-2 py-4 bg-linear-to-tl rounded-xl from-zinc-900 to-zinc-700 hover:scale-105 transition-transform duration-300">
-                   <div className="flex item-center justify-between ">
-                     <div className="px-3 py-1 pb-4">
+                   <div className="flex flex-col md:flex-row item-center justify-between ">
+                     <div className="px-3 py-1 pb-4 text-[18px] md:text-base">
                         <h3 className="font-bold">{item.Food.name}</h3>
                         <p className="font-light text-gray-200">{item.Food.price} x {item.qty} = {item.Food.price * item.qty}</p>
                     </div>
-                    <div className="mt-3 ">
+                    <div className="mt-3 text-center md:text-start pb-3 md:pb-0">
                         <button disabled={item.SaleTempdetails.length > 0 } className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-500 disabled:cursor-default cursor-pointer rounded-l-3xl px-1" onClick={e=> updateQty(item.id, item.qty-1)}>
                             <i className="fa fa-minus text-[14px]"></i>
                         </button>
-                        <input type="text" disabled value={item.qty} className="text-center w-10 bg-white text-black focus:outline-none"/>
+                        <input type="text" disabled value={item.qty} className="text-center w-8/12  md:w-10 bg-white text-black focus:outline-none"/>
                          <button disabled={item.SaleTempdetails.length > 0 } className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-500 disabled:cursor-default cursor-pointer rounded-r-3xl px-1" onClick={e=> updateQty(item.id, item.qty+1)}>
                             <i className="fa fa-plus text-[14px]"></i>
                         </button>
@@ -640,8 +681,8 @@ const Page = () => {
                     <div>
                         <hr />
                         <div className="flex gap-2 w-full pt-2 ">
-                            <button onClick={e=>removeSaleTemp(item.id)} className="px-4 py-2 hover:bg-red-400 bg-red-500 w-full rounded-3xl cursor-pointer"><i className="fa fa-times "></i>ยกเลิก</button>
-                            <button onClick={e=>openModalEdit(item)} className="px-4 py-2 hover:bg-blue-400 bg-blue-500 w-full rounded-3xl cursor-pointer"><i className="fa fa-gear me-1"></i>แก้ไข</button>
+                            <button onClick={e=>removeSaleTemp(item.id)} className="py-1 md:px-4 md:py-2 hover:bg-red-400 bg-red-500 w-full rounded-3xl cursor-pointer"><i className="fa fa-times "></i>ยกเลิก</button>
+                            <button onClick={e=>openModalEdit(item)} className="py-1 md:px-4 md:py-2 hover:bg-blue-400 bg-blue-500 w-full rounded-3xl cursor-pointer"><i className="fa fa-gear me-1"></i>แก้ไข</button>
                         </div>
                     </div>
                 </div>
@@ -714,8 +755,8 @@ const Page = () => {
                 </div>
             </Modal>
 
-            <Modal open={openEndSale} onClose={closeModalEndSale} title="จบการขาย" >
-                <div className="space-y-4">
+            <Modal open={openEndSale} onClose={closeModalEndSale} title="จบการขาย"  zIndex={60} >
+                <div className="space-y-4 z-10">
                    <div>
                         <h3>รูปแบบการชำระเงิน</h3>
                         <div className="flex gap-4">
@@ -789,6 +830,91 @@ const Page = () => {
                     <iframe src={`${config.pathImg}/${billUrl}`} className="w-full h-[600px]"></iframe>
                 </div>
             </Modal>
+
+
+            <Modal open={openCart} onClose={closeModalCart} title="รายการอาหาร">
+                <div className="flex flex-col h-[85vh] sm:h-[75vh]">
+
+                    <div className="shrink-0 text-end text-2xl bg-black shadow-xl px-4 py-3 rounded-2xl">
+                    {(amount + amountAdded).toLocaleString("TH-th")} .-
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto space-y-4 mt-4 pr-1">
+
+                    {saleTemp.length > 0 &&
+                        saleTemp.map((item: SaleTemp) => (
+                        <div
+                            key={item.id}
+                            className="bg-linear-to-tl from-zinc-900 to-zinc-700 rounded-xl hover:scale-[1.02] transition-transform"
+                        >
+                            <div className="flex justify-between items-center px-4 py-2">
+                            <div>
+                                <h3 className="font-bold text-lg">{item.Food.name}</h3>
+                                <p className="text-gray-300">฿ {item.Food.price}</p>
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                                <button
+                                disabled={item.SaleTempdetails.length > 0}
+                                onClick={() => updateQty(item.id, item.qty - 1)}
+                                className="px-2 py-1 bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-500 rounded-full"
+                                >
+                                <i className="fa fa-minus text-sm"></i>
+                                </button>
+
+                                <input
+                                disabled
+                                value={item.qty}
+                                className="w-10 text-center bg-white text-black rounded"
+                                />
+
+                                <button
+                                disabled={item.SaleTempdetails.length > 0}
+                                onClick={() => updateQty(item.id, item.qty + 1)}
+                                className="px-2 py-1 bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-500 rounded-full"
+                                >
+                                <i className="fa fa-plus text-sm"></i>
+                                </button>
+                            </div>
+                            </div>
+
+                            <hr className="border-zinc-600" />
+
+                        
+                            <div className="flex gap-2 px-4 py-2">
+                            <button
+                                onClick={() => removeSaleTemp(item.id)}
+                                className="w-full py-1 bg-red-500 hover:bg-red-400 rounded-2xl"
+                            >
+                                <i className="fa fa-times me-1"></i>
+                                ยกเลิก
+                            </button>
+
+                            <button
+                                onClick={() => openModalEdit(item)}
+                                className="w-full py-1 bg-blue-500 hover:bg-blue-400 rounded-2xl"
+                            >
+                                <i className="fa fa-gear me-1"></i>
+                                แก้ไข
+                            </button>
+                            </div>
+                        </div>
+                        ))}
+                    </div>
+
+                    
+                    <div className="shrink-0 pt-4">
+                    <button
+                        onClick={openModalEndSale}
+                        className="w-full px-4 py-3 bg-green-600 hover:bg-green-500 rounded-xl transition-colors"
+                    >
+                        <i className="fa fa-check me-2"></i>
+                        จบการขาย
+                    </button>
+                    </div>
+                </div>
+            </Modal>
+
         </div>
     )
 }

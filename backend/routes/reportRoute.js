@@ -4,7 +4,7 @@ import isAuthen from '../middlewares/authUser.js';
 
 const reportRouter = express.Router();
 
-reportRouter.post("/sumPerDayInYearAndMonth",isAuthen, sumPerDayInYearAndMonth)
+reportRouter.post("/sumPerDayInYearAndMonth", sumPerDayInYearAndMonth)
 reportRouter.post("/sumPerMonthInYear", isAuthen, sumPerMonthInYear)
 
 export default reportRouter;
