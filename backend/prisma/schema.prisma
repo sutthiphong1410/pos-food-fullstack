@@ -41,7 +41,7 @@ model FoodSize {
   moneyAdded      Int
   status          String           @default("use")
   FoodType        FoodType         @relation(fields: [foodTypeId], references: [id])
-  SaleTempdetails SaleTempDetail[]
+  SaleTempdetails SaleTempDetail
   BillSaleDetails BillSaleDetail[]
 }
 

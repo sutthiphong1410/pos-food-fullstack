@@ -15,9 +15,9 @@ const Layout = ({
 
     return (
       <div className="min-h-screen bg-linear-to-tr from-zinc-800 to-zinc-950">
-      <div className="flex-col md:flex">
+      <div className="flex-col lg:flex">
 
-      <div className="md:hidden p-3 flex items-center justify-end">
+      <div className="lg:hidden p-3 flex items-center justify-end">
         <button onClick={() => setOpen(true)} className={open == true ? "hidden":"block"}>
           <i className="fa-solid fa-bars text-white text-xl"></i>
         </button>
@@ -41,7 +41,7 @@ const Layout = ({
         <aside className="
           fixed z-40 rounded-3xl h-lvh w-64
           bg-zinc-900
-          hidden md:block
+          hidden lg:block
         ">
           <Sidebar />
         </aside>
@@ -52,7 +52,7 @@ const Layout = ({
         {/* Main */}
         <main className="
           flex-1
-          md:ml-64
+          lg:ml-64
           p-3
           
         ">

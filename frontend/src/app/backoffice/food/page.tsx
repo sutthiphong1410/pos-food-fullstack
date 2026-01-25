@@ -168,6 +168,7 @@ const Page = () => {
     const handleEdit = (item: Food) => {
         setId(item.id)
         setFoodTypeId(item.foodTypeId)
+        setFoodType(item.foodType)
         setName(item.name)
         setPrice(item.price)
         setImg(item.img)
@@ -214,10 +215,10 @@ const Page = () => {
     return (
         <>
            <div className="space-y-4">
-            <h3 className="font-bold">อาหาร</h3>
+            <h3 className="font-bold ">อาหาร</h3>
             <hr className="border-1 border-emerald-500"/>
                 <div className="space-y-4">
-                    <button onClick={()=>{clearForm(); openModal();}} className="btn-add">
+                    <button onClick={()=>{clearForm(); openModal();}} className="btn-add ">
                         <i className="fa fa-plus me-2"></i>เพิ่มรายการ
                     </button>
 
@@ -288,7 +289,7 @@ const Page = () => {
             </div>
 
             <Modal open={open} onClose={closeModal} modalSize="max-w-xl" title="ขนาดอาหาร/เครื่องดื่ม">
-                <div className="space-y-3">
+                <div className="space-y-3 max-xs:overflow-y-auto max-xs:max-h-[80vh]">
                     <select className="w-full rounded-lg bg-zinc-800 border border-zinc-700 px-3 py-2 text-white" value={foodTypeId} onChange={e=>setFoodTypeId(parseInt(e.target.value))} >
                         <option value="">เลือกประเภทอาหาร/เครื่องดื่ม</option>
                         {foodTypes.map((item: FoodType) => (
@@ -297,7 +298,7 @@ const Page = () => {
                     </select>
                     
                     {img != '' &&
-                        <img className="rounded-2xl" src={config.pathImg+'/uploads/'+img} alt={name} width={200} />
+                        <img className="rounded-2xl max-xs:mx-auto" src={config.pathImg+'/uploads/'+img} alt={name} width={200} />
                     }
                     <label className="cursor-pointer w-full flex items-center justify-between gap-3 rounded-lg bg-zinc-800 border border-zinc-700 px-3 py-2 text-zinc-400 hover:bg-zinc-700">
             

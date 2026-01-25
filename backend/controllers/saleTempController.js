@@ -13,8 +13,8 @@ export const create = async (req, res) => {
                 tableNo: req.body.tableNo,
                 foodId: req.body.foodId
             },
-            include:{
-                SaleTempdetails:true
+            include: {
+                SaleTempdetails: true
             }
         })
 
@@ -29,7 +29,7 @@ export const create = async (req, res) => {
                 }
             })
         } else {
-           if(rowSaleTemp.SaleTempdetails.length === 0){
+            if (rowSaleTemp.SaleTempdetails.length === 0) {
                 await prisma.saleTemp.update({
                     where: {
                         id: rowSaleTemp.id
@@ -164,7 +164,7 @@ export const generateSaleTempDetail = async (req, res) => {
                     }
                 })
             }
-        } 1
+        }
         res.status(201).json({ message: "สำเร็จ" })
     } catch (error) {
         console.log(error)
@@ -286,101 +286,134 @@ export const unSelectSize = async (req, res) => {
     }
 }
 
-export const createSaleTempDetail = async (req,res) => {
-    try{
+export const createSaleTempDetail = async (req, res) => {
+    try {
         const saleTempId = req.body.saleTempId
         const saleTempDetail = await prisma.saleTempDetail.findFirst({
-            where:{
-                saleTempId:saleTempId
+            where: {
+                saleTempId: saleTempId
             }
         })
 
         await prisma.saleTempDetail.create({
-            data:{
-                foodId:saleTempDetail.foodId,
-                saleTempId:saleTempDetail.saleTempId
+            data: {
+                foodId: saleTempDetail.foodId,
+                saleTempId: saleTempDetail.saleTempId
             }
         })
 
         const countSaleTempDetail = await prisma.saleTempDetail.count({
-            where:{
-                saleTempId:saleTempDetail.saleTempId
+            where: {
+                saleTempId: saleTempDetail.saleTempId
             }
         })
 
         await prisma.saleTemp.update({
-            where:{
-                id:saleTempDetail.saleTempId
+            where: {
+                id: saleTempDetail.saleTempId
             },
-            data:{
-                qty:countSaleTempDetail
+            data: {
+                qty: countSaleTempDetail
             }
         })
 
-        res.status(200).json({message:"สำเร็จ"})
-    }catch(error){
+        res.status(200).json({ message: "สำเร็จ" })
+    } catch (error) {
         console.log(error)
-        res.status(500).json({error:"Server Error"})
+        res.status(500).json({ error: "Server Error" })
     }
 }
 
-export const removeSaleTempDetail = async (req,res) => {
-    try{
+export const removeSaleTempDetail = async (req, res) => {
+    try {
         const saleTempDetailId = req.body.saleTempDetailId
         const saleTempDetail = await prisma.saleTempDetail.findUnique({
-            where:{
-                id:saleTempDetailId
+            where: {
+                id: saleTempDetailId
             }
         })
 
         await prisma.saleTempDetail.delete({
-            where:{
-                id:saleTempDetailId
+            where: {
+                id: saleTempDetailId
             }
         })
 
         const countSaleTempDetail = await prisma.saleTempDetail.count({
-            where:{
-                saleTempId:saleTempDetail.saleTempId
+            where: {
+                saleTempId: saleTempDetail.saleTempId
             }
         })
 
         await prisma.saleTemp.update({
-            where:{
-                id:saleTempDetail.saleTempId
+            where: {
+                id: saleTempDetail.saleTempId
             },
-            data:{
-                qty:countSaleTempDetail
+            data: {
+                qty: countSaleTempDetail
             }
         })
 
-        res.status(200).json({message:"สำเร็จ"})
-    }catch(error){
+        res.status(200).json({ message: "สำเร็จ" })
+    } catch (error) {
         console.log(error)
-        res.status(500).json({error:"Server Error"})
+        res.status(500).json({ error: "Server Error" })
     }
 }
 
-export const printBillBeforePay = async (req,res) => {
-    try{
+export const printBillBeforePay = async (req, res) => {
+    try {
         const organization = await prisma.organization.findFirst()
-
-        const saleTemps =  await prisma.saleTemp.findMany({
-            where:{
-                userId:parseInt(req.body.userId),
-                tableNo:req.body.tableNo
+        const saleTemps = await prisma.saleTemp.findMany({
+            where: {
+                userId: parseInt(req.body.userId),
+                tableNo: req.body.tableNo
             },
-            include:{
-                SaleTempdetails:true,
-                Food:true
+            include: {
+                SaleTempdetails: {
+                    include: {
+                        FoodSize: true,
+                    }
+                },
+                Food: true
+            }
+        })
+        const saleTempIds = saleTemps.map(st => st.id)
+
+        const saleTempDetails = await prisma.saleTempDetail.findMany({
+            where: {
+                saleTempId: {
+                    in: saleTempIds
+                }
+            },
+            include: {
+                Food: true,
+                FoodSize: true
             }
         })
 
+        
         const paperWidth = 80;
         const padding = 3;
 
+        const LINE_HEIGHT = 8
+        const HEADER_HEIGHT = 120
+        const FOOTER_HEIGHT = 20
+
+        let itemHeight = 0
+
+        saleTemps.forEach(item => {
+        itemHeight += LINE_HEIGHT * 2 
+
+        const optionCount = item.SaleTempdetails.filter(d => d.FoodSize).length
+        itemHeight += optionCount * LINE_HEIGHT
+        })
+
+        const paperHeight = HEADER_HEIGHT + itemHeight + FOOTER_HEIGHT
+
+
         const doc = new pdfkit({
-            size: [paperWidth, 200],
+            size: [paperWidth, paperHeight],
             margins: {
                 top: 3,
                 bottom: 3,
@@ -388,86 +421,179 @@ export const printBillBeforePay = async (req,res) => {
                 right: 3
             }
         })
+
+        const printSpaceBetween = (label, value) => {
+        const y = doc.y
+        const contentWidth = paperWidth - (padding * 2)
+
+        doc.text(label, padding, y, { align: 'left' })
+        doc.text(value, padding, y, {
+            width: contentWidth,
+            align: 'right'
+        })
+
+        doc.moveDown(0.4)
+}
         const fileName = `uploads/bill-${dayjs(new Date()).format('YYYYMMDD_HHmmss')}.pdf`
         const font = "Kanit/kanit-regular.ttf"
 
+
+
         doc.pipe(fs.createWriteStream(fileName))
 
-        const imageWidth = 20;
-        const postionX = (paperWidth / 2 ) - (imageWidth / 2) 
-        doc.image('uploads/'+organization.logo,postionX, 5,{
+        
+        const imageWidth = 30;
+        const postionX = (paperWidth / 2) - (imageWidth / 2)
+        const logoMax = [30, 20]
+
+        doc.image('uploads/' + organization.logo,postionX, 5, {
+            fit: logoMax,
             align: 'center',
-            width: imageWidth,
-            height: 20
         })
 
-        doc.moveDown()
+        doc.moveDown(1.2)
 
         doc.font(font)
-        doc.fontSize(5).text('*** ใบแจ้งรายการ ***',20,doc.y+ 8)
-        doc.fontSize(8)
-        doc.text(organization.name, padding, doc.y)
         doc.fontSize(5)
-        doc.text(organization.address)
-        doc.text(`เบอร์โทร: ${organization.phone}`)
-        doc.text(`เลขประจำตัวผู้เสียภาษี: ${organization.taxCode}`)
-        doc.text(`โต๊ะที่: ${req.body.tableNo}`, {align:'center'})
-        doc.text(`วันที่: ${dayjs(new Date()).format('DD/MM/YYYY HH:mm:ss')}`, {align:'center'})
-        doc.text('รายการที่สั่ง', {align:'center'})
-        doc.moveDown()
+        doc.text(organization.name, padding, doc.y+8, { align: 'center' })
+        doc.fontSize(4).text('*** ใบแจ้งยอดก่อนชำระเงิน ***', { align: 'center' })
+    
+        doc.fontSize(4)
+        doc.text(`TAX# ${organization.taxCode}`, { align: 'center' })
+        doc.text(`ที่อยู่: ${organization.address}`, { align: 'center' })
+        doc.text(`เบอร์โทร: ${organization.phone}`, { align: 'center' })
+        doc.moveDown(0.1)
+        doc.text(`พร้อมเพย์`, { align: 'center' })
+        doc.text(`${organization.promtpay}`, { align: 'center' })
+
+        doc.fontSize(4)
+        doc.text(`โต๊ะที่: ${req.body.tableNo}`, { align: 'start' })
+        doc.text(`พนักงาน: ${req.body.userName}`, { align: 'start' })
+        doc.moveDown(0.4)
+        
 
         const y = doc.y
         doc.fontSize(4)
-        doc.text('รายการ',padding,y)
-        doc.text('ราคา',padding + 18, y, {width:20, align:'right'})
-        doc.text('จำนวน',padding + 36, y, {width:20, align:'right'})
-        doc.text('รวม',padding + 55, y, {align:'right'})
-
+        doc.lineWidth(0.1)
+        doc.moveTo(padding, y -1).lineTo(paperWidth - padding, y - 1).stroke()
+        doc.text('รายการที่สั่ง', padding, y)
         doc.lineWidth(0.1)
         doc.moveTo(padding, y + 6).lineTo(paperWidth - padding, y + 6).stroke()
 
-        saleTemps.map((item, index)=> {
-            const y = doc.y
-            doc.text(item.Food.name, padding, y)
-            doc.text(item.Food.price, padding + 18, y, {width:20, align:'right'})
-            doc.text(item.qty, padding + 36, y, {width:20, align:'right'})
-            doc.text(item.Food.price  * item.qty, padding + 55, y, {align:'right'})
-        })
 
-        let sumAmount=0
-        saleTemps.forEach(item=>{
-            sumAmount += item.Food.price * item.qty
-        })
+                let total = 0
 
-        doc.text(`รวม: ${sumAmount.toLocaleString('th-TH')} บาท`, {align:'right'})
-        doc.end()
+            saleTemps.forEach(item => {
+            const startY = doc.y
 
-        res.status(200).json({fileName:fileName})
-    }catch(error){
+            // ===== รวม option =====
+            const optionMap = item.SaleTempdetails
+                .filter(d => d.FoodSize)
+                .reduce((acc, d) => {
+                const name = d.FoodSize.name
+                if (!acc[name]) {
+                    acc[name] = {
+                    count: 0,
+                    price: Number(d.FoodSize.moneyAdded)
+                    }
+                }
+                acc[name].count += 1
+                return acc
+                }, {})
+
+            const optionTotal = Object.values(optionMap)
+                .reduce((sum, o) => sum + (o.count * o.price), 0)
+
+            const foodTotal =
+                (item.Food.price * item.qty) + optionTotal
+
+                total += foodTotal
+
+                // ===== บรรทัดที่ 1 =====
+                doc.text(item.Food.name, padding, startY)
+                doc.text(
+                    `฿${foodTotal.toFixed(2)}`,
+                    padding + 55,
+                    startY,
+                    { align: 'right' }
+                )
+
+                
+
+                // ===== บรรทัดที่ 2 =====
+                doc.text(
+                    `${item.qty} x ฿${item.Food.price.toFixed(2)}`,
+                    padding
+                )
+
+                // ===== บรรทัด option (รวมชื่อเดียวกัน) =====
+                Object.entries(optionMap).forEach(([name, o]) => {
+                    doc.text(
+                    `(${name} ${o.count}) +${o.count * o.price}`,
+                    padding
+                    )
+                })
+
+            doc.moveDown(0.4)
+            })
+
+
+
+            doc.moveDown(0.5)
+            doc.lineWidth(0.1)
+            doc.moveTo(padding, doc.y).lineTo(paperWidth - padding, doc.y).stroke()
+            doc.moveDown(0.4)
+
+            printSpaceBetween(
+                'รวม',
+                `฿${total.toLocaleString('th-TH')}`
+            )
+
+            printSpaceBetween(
+                'ภาษีมูลค่าเพิ่ม (VAT 7%)',
+                `฿${(total * 0.07).toLocaleString('th-TH')}`
+            )
+
+            const netAmount = total + (total * 0.07)
+
+            doc.fontSize(4)
+            printSpaceBetween('ยอดสุทธิ',`฿${netAmount.toLocaleString('th-TH')}`)
+            doc.fontSize(4)
+            doc.lineWidth(0.1)
+            doc.moveTo(padding, doc.y).lineTo(paperWidth - padding, doc.y).stroke()
+            doc.moveDown(0.5)
+            doc.text('ขอบพระคุณที่ใช้บริการ', { align: 'center' })
+            doc.moveDown(0.2)
+
+           doc.text(`${dayjs(new Date()).format('DD/MM/YYYY HH:mm:ss')}`)
+            doc.end()
+
+        res.status(200).json({ fileName: fileName, saleTempDetails: saleTempDetails })
+    } catch (error) {
         console.log(error)
-        res.status(500).json({error:"Server Error"})
+        res.status(500).json({ error: "Server Error" })
     }
 }
 
 export const endSale = async (req, res) => {
-    try{
+    try {
         const saleTemps = await prisma.saleTemp.findMany({
-            include:{
-                SaleTempdetails:{
-                    include:{
-                        Food:true,
+            include: {
+                SaleTempdetails: {
+                    include: {
+                        Food: true,
                         FoodSize: true,
                     }
                 },
-                Food:true
+                Food: true
             },
-            where:{
-                userId:req.body.userId,
+            where: {
+                userId: req.body.userId,
             }
         })
 
         const billSale = await prisma.billSale.create({
-            data:{
+            data: {
                 amount: req.body.amount,
                 inputMoney: req.body.inputMoney,
                 payType: req.body.payType,
@@ -477,12 +603,12 @@ export const endSale = async (req, res) => {
             }
         })
 
-        for(let i=0; i< saleTemps.length; i++){
+        for (let i = 0; i < saleTemps.length; i++) {
             const item = saleTemps[i]
 
-            if(item.SaleTempdetails.length > 0){
+            if (item.SaleTempdetails.length > 0) {
 
-                for(let j=0; j< item.SaleTempdetails.length; j++){
+                for (let j = 0; j < item.SaleTempdetails.length; j++) {
                     const detail = item.SaleTempdetails[j]
                     await prisma.billSaleDetail.create({
                         data: {
@@ -490,164 +616,255 @@ export const endSale = async (req, res) => {
                             foodId: detail.foodId,
                             tasteId: detail.tasteId,
                             foodSizeId: detail.foodSizeId,
-                            moneyAdded: detail.FoodSize.moneyAdded,
+                            moneyAdded: detail.FoodSize?.moneyAdded ?? null,
                             price: detail.Food.price,
                         }
                     })
                 }
-            }else{
-                if(item.qty > 0){
-                    for(let k=0; k< item.qty; k++){
+            } else {
+                if (item.qty > 0) {
+                    for (let k = 0; k < item.qty; k++) {
                         await prisma.billSaleDetail.create({
-                            data:{
-                                billSaleId:billSale.id,
-                                foodId:item.foodId,
-                                price:item.Food.price
+                            data: {
+                                billSaleId: billSale.id,
+                                foodId: item.foodId,
+                                price: item.Food.price
                             }
                         })
                     }
-                }else{
+                } else {
                     await prisma.billSaleDetail.create({
-                        data:{
-                            billSaleId:billSale.id,
-                            foodId:item.foodId,
-                            price:item.Food.price
+                        data: {
+                            billSaleId: billSale.id,
+                            foodId: item.foodId,
+                            price: item.Food.price
                         }
                     })
                 }
             }
         }
-        
-        for(let i=0; i< saleTemps.length; i++){
+
+        for (let i = 0; i < saleTemps.length; i++) {
             const item = saleTemps[i]
 
             await prisma.saleTempDetail.deleteMany({
-                where:{
-                    saleTempId:item.id
+                where: {
+                    saleTempId: item.id
                 }
             })
         }
 
 
         await prisma.saleTemp.deleteMany({
-            where:{
-                userId:req.body.userId
+            where: {
+                userId: req.body.userId
             }
         })
 
-        res.status(200).json({message:"สำเร็จ"})
-    }catch(error){
+        res.status(200).json({ message: "สำเร็จ" })
+    } catch (error) {
         console.log(error)
-        res.status(500).json({error:"Server Error"})
+        res.status(500).json({ error: "Server Error" })
     }
 }
 
-export const printBillAfterPay = async (req,res) => {
-    try{
-        const organization = await prisma.organization.findFirst()
+export const printBillAfterPay = async (req, res) => {
+  try {
+    const organization = await prisma.organization.findFirst()
 
-        const billSale =  await prisma.billSale.findFirst({
-            where:{
-                userId:parseInt(req.body.userId),
-                tableNo:req.body.tableNo,
-                status:"use"
-            },
-            include:{
-                billSaleDetails:{
-                    include:{
-                        Food:true,
-                        FoodSize:true
-                    },
-                },
-                User:true
-            },
-            orderBy:{
-                id:'desc'
-            }
+    const billSale = await prisma.billSale.findFirst({
+      where: {
+        userId: parseInt(req.body.userId),
+        tableNo: req.body.tableNo,
+        status: "use"
+      },
+      include: {
+        billSaleDetails: {
+          include: {
+            Food: true,
+            FoodSize: true
+          }
+        },
+        User: true
+      },
+      orderBy: { id: 'desc' }
+    })
+
+    const billSaleDetails = billSale.billSaleDetails
+
+    // =======================
+    // คำนวณความสูงกระดาษ
+    // =======================
+    const LINE_HEIGHT = 8
+    let itemHeight = 0
+
+    const grouped = Object.values(
+      billSaleDetails.reduce((acc, d) => {
+        const key = d.foodId
+        acc[key] ??= {
+          food: d.Food,
+          qty: 0,
+          options: []
+        }
+        acc[key].qty += 1
+        if (d.FoodSize) acc[key].options.push(d.FoodSize)
+        return acc
+      }, {})
+    )
+
+    grouped.forEach(item => {
+      itemHeight += LINE_HEIGHT * 2
+      itemHeight += item.options.length * LINE_HEIGHT
+    })
+
+    const paperWidth = 80
+    const paperHeight = 120 + itemHeight + 40
+    const padding = 3
+
+    const doc = new pdfkit({
+      size: [paperWidth, paperHeight],
+      margins: { top: 3, bottom: 3, left: 3, right: 3 }
+    })
+
+    const printSpaceBetween = (label, value) => {
+    const y = doc.y
+    const contentWidth = paperWidth - (padding * 2)
+        doc.text(label, padding, y, { align: 'left' })
+        doc.text(value, padding, y, {
+        width: contentWidth,
+        align: 'right'
         })
+    }   
 
-        const billSaleDetails = billSale.billSaleDetails
+    doc.moveDown(0.4)
 
-         const paperWidth = 80;
-        const padding = 3;
+    const fileName = `uploads/invoice-${dayjs().format('YYYYMMDD_HHmmss')}.pdf`
+    const font = "Kanit/kanit-regular.ttf"
+    doc.pipe(fs.createWriteStream(fileName))
 
-        const doc = new pdfkit({
-            size: [paperWidth, 200],
-            margins: {
-                top: 3,
-                bottom: 3,
-                left: 3,
-                right: 3
-            }
-        })
-        const fileName = `uploads/invoice-${dayjs(new Date()).format('YYYYMMDD_HHmmss')}.pdf`
-        const font = "Kanit/kanit-regular.ttf"
+    // =======================
+    // HEADER (เหมือน BeforePay)
+    // =======================
+      const imageWidth = 30;
+        const postionX = (paperWidth / 2) - (imageWidth / 2)
+        const logoMax = [30, 20]
 
-        doc.pipe(fs.createWriteStream(fileName))
+    doc.image('uploads/' + organization.logo,postionX, 5, {
+        fit: logoMax,
+        align: 'center',
+    })
 
-        const imageWidth = 20;
-        const postionX = (paperWidth / 2 ) - (imageWidth / 2) 
-        doc.image('uploads/'+organization.logo,postionX, 5,{
-            align: 'center',
-            width: imageWidth,
-            height: 20
-        })
+    doc.moveDown(1.2)
 
-        doc.moveDown()
+    doc.font(font)
+    doc.fontSize(5)
+    doc.text(organization.name, { align: 'center' })
+    doc.fontSize(4).text('*** ใบเสร็จรับเงิน ***', { align: 'center' })
 
-        doc.font(font)
-        doc.fontSize(5).text('*** ใบเสร็จรับเงิน ***',20,doc.y+ 8)
-        doc.fontSize(8)
-        doc.text(organization.name, padding, doc.y)
-        doc.fontSize(5)
-        doc.text(organization.address)
-        doc.text(`เบอร์โทร: ${organization.phone}`)
-        doc.text(`เลขประจำตัวผู้เสียภาษี: ${organization.taxCode}`)
-        doc.text(`โต๊ะที่: ${req.body.tableNo}`, {align:'center'})
-        doc.text(`วันที่: ${dayjs(new Date()).format('DD/MM/YYYY HH:mm:ss')}`, {align:'center'})
-        doc.text('รายการที่สั่ง', {align:'center'})
-        doc.moveDown()
+    doc.fontSize(4)
+    doc.text(`TAX# ${organization.taxCode}`, { align: 'center' })
+    doc.text(`ที่อยู่: ${organization.address}`, { align: 'center' })
+    doc.text(`เบอร์โทร: ${organization.phone}`, { align: 'center' })
+    doc.moveDown(0.1)
+    doc.text(`พร้อมเพย์`, { align: 'center' })
+    doc.text(`${organization.promtpay}`, { align: 'center' })
 
-        const y = doc.y
+    doc.fontSize(4)
+    doc.text(`โต๊ะที่: ${req.body.tableNo}`, { align: 'start' })
+    doc.text(`พนักงาน: ${req.body.userName}`, { align: 'start' })
+    doc.moveDown(0.4)
+
+    
+    doc.fontSize(4)
+    doc.lineWidth(0.1)
+    doc.moveTo(padding, doc.y -1).lineTo(paperWidth - padding, doc.y - 1).stroke()
+    doc.text('รายการที่สั่ง', padding, doc.y)
+    doc.lineWidth(0.1)
+    doc.moveTo(padding, doc.y + 0.5).lineTo(paperWidth - padding, doc.y + 0.5).stroke()
+
+    // =======================
+    // BODY (เหมือน BeforePay)
+    // =======================
+    let total = 0
+
+    grouped.forEach(item => {
+      const startY = doc.y
+
+      // รวม option
+      const optionMap = item.options.reduce((acc, o) => {
+        acc[o.name] ??= { count: 0, price: Number(o.moneyAdded ?? 0) }
+        acc[o.name].count++
+        return acc
+      }, {})
+
+      const optionTotal = Object.values(optionMap)
+        .reduce((s, o) => s + o.count * o.price, 0)
+
+      const foodTotal =
+        (item.food.price * item.qty) + optionTotal
+
+      total += foodTotal
+
+      // บรรทัด 1
+      doc.text(item.food.name, padding, startY)
+      doc.text(`฿${foodTotal.toFixed(2)}`, padding + 55, startY, { align: 'right' })
+
+      // บรรทัด 2
+      doc.text(`${item.qty} x ฿${item.food.price.toFixed(2)}`, padding)
+
+      // option
+      Object.entries(optionMap).forEach(([name, o]) => {
+        doc.text(`(${name} ${o.count}) +${o.count * o.price}`, padding)
+      })
+
+      doc.moveDown(0.4)
+    })
+
+    // =======================
+    // FOOTER
+    // =======================
+     doc.moveDown(0.5)
+     doc.lineWidth(0.1)
+     doc.moveTo(padding, doc.y).lineTo(paperWidth - padding, doc.y).stroke()
+     doc.moveDown(0.4)
+
+     const netAmount = total + (total * 0.07)
+    printSpaceBetween(
+                'รวมทั้งหมด',
+                `฿${netAmount.toLocaleString('th-TH')}`
+            )
+    printSpaceBetween(
+                'ภาษีมูลค่าเพิ่ม (VAT 7%)',
+                `฿${(total * 0.07).toLocaleString('th-TH')}`
+            )
+    printSpaceBetween(
+                `${billSale.payType === 'cash' ? 'เงินสด' : 'เงินโอน'}`,
+                `฿${billSale.inputMoney.toLocaleString('th-TH')}`
+            )
+    printSpaceBetween(
+                'เงินทอน',
+                `฿${billSale.returnMoney.toLocaleString('th-TH')}`
+            )
         doc.fontSize(4)
-        doc.text('รายการ',padding,y)
-        doc.text('ราคา',padding + 18, y, {width:20, align:'right'})
-        doc.text('จำนวน',padding + 36, y, {width:20, align:'right'})
-        doc.text('รวม',padding + 55, y, {align:'right'})
-
         doc.lineWidth(0.1)
-        doc.moveTo(padding, y + 6).lineTo(paperWidth - padding, y + 6).stroke()
+        doc.moveTo(padding, doc.y).lineTo(paperWidth - padding, doc.y).stroke()
+        doc.moveDown(0.5)
+        doc.text('ขอบพระคุณที่ใช้บริการ', { align: 'center' })
+        doc.moveDown(0.2)
 
-        billSaleDetails.map((item, index)=> {
-            const y = doc.y
-            let name = item.Food.name
-            if(item.foodSizeId != null) name += `${item.FoodSize.name} +${item.FoodSize.moneyAdded}`
-            doc.text(name, padding, y)
-            doc.text(item.Food.price, padding + 18, y, {width:20, align:'right'})
-            doc.text(1, padding + 36, y, {width:20, align:'right'})
-            doc.text(item.Food.price  + item.moneyAdded, padding + 55, y, {align:'right'})
-        })
-
-        let sumAmount=0
-        billSaleDetails.forEach(item=>{
-            sumAmount += item.Food.price + item.moneyAdded
-        })
-
-        doc.text(`รวม: ${sumAmount.toLocaleString('th-TH')} บาท`,padding, doc.y, {align:'right', width:paperWidth - padding*2})
-
-        doc.text(`รับเงินมา: ${billSale.inputMoney.toLocaleString('th-TH')} บาท`,padding, doc.y, {align:'right', width:paperWidth - padding*2})
-        doc.text(`เงินทอน: ${billSale.returnMoney.toLocaleString('th-TH')} บาท`,padding, doc.y, {align:'right', width:paperWidth - padding*2})
-
+        doc.text(`${dayjs(new Date()).format('DD/MM/YYYY HH:mm:ss')}`)
         doc.end()
 
-        res.status(200).json({fileName:fileName})
-    }catch(error){
-        console.log(error)
-        res.status(500).json({error:"Server Error"})
-    }
-
+    res.status(200).json({ fileName })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: "Server Error" })
+  }
 }
 
+
+
+//แก้ billSaleDetail moneyAdded
 
 
 

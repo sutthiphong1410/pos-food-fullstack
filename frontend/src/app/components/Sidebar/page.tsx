@@ -67,10 +67,12 @@ export default function Page({ onSelect }: SidebarProps) {
   return (
     <div className="shadow-xl bg-zinc-900  h-full rounded-xl text-white overflow-y-auto">
       <div className="py-8 flex flex-col items-center justify-center space-y-2">
-        <div>logo</div>
-        <h3 className="text-lg">{name}</h3>
-        <p className="text-zinc-400 text-sm font-light">software developer</p>
-        <button onClick={logout} className="bg-red-500 rounded-full p-1 cursor-pointer hover:bg-red-400"><i className="fa-solid fa-arrow-right-from-bracket "></i></button>
+        
+        <h3 className="text-lg">
+          <i className="fa fa-user"></i>{name}
+        </h3>
+        
+        <button onClick={logout} className="bg-red-500 rounded-full px-2 py-1 cursor-pointer hover:bg-red-400"><i className="fa-solid fa-arrow-right-from-bracket "></i></button>
       </div>
       <div className="pl-7 font-light px-4">
         <ul>

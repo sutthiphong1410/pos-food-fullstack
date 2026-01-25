@@ -27,7 +27,11 @@ const Page = () => {
     const [openEndSale, setOpenEndSale] = useState(false)
     const [openBill, setOpenBill] = useState(false)
     const [openCart, setOpenCart] = useState(false)
- 
+
+    const [vateRate, setVateRate] = useState(0.07)
+
+    const vatAmount = Math.round(amount * vateRate * 100) / 100
+    const amountIncludeVat = amount + vatAmount
 
     useEffect(()=> {
         fetchDataFoods()
@@ -73,6 +77,7 @@ const Page = () => {
 
 
 
+
     const generateSaleTempDetail = async (saleTempId: number) => {
         try{
             const payload ={
@@ -97,12 +102,19 @@ const Page = () => {
 
     const sumAmount = (saleTemp: SaleTemp[]) => {
         let total = 0
-        saleTemp.forEach((item:SaleTemp) => {
-            total += item.Food.price * item.qty
-        });
 
-        setAmount(total)
+        saleTemp.forEach(item => {
+            const optionTotal = item.SaleTempdetails
+            ?.filter(d => d.FoodSize?.moneyAdded)
+            .reduce((sum, d) => sum + d.FoodSize.moneyAdded, 0) ?? 0
+
+            total += (item.Food.price * item.qty) + optionTotal
+        })
+
+        const net = total 
+        setAmount(net)
     }
+
 
  
 
@@ -263,6 +275,7 @@ const Page = () => {
                 await axios.delete(config.apiUrl+"/sale/removeAll",{data:payload})
                 fetchDataSaleTemp()
                 toast.success("ลบคำสั่งซื้อสำเร็จ",{autoClose:2000})
+                closeModalCart()
             }
 
         }catch(error: unknown){
@@ -413,7 +426,7 @@ const Page = () => {
     const createSaleTempDetail = async () => {
         try{
             const payload = {
-                slaeTempId: saleTempId
+                saleTempId: saleTempId
             }
 
             await axios.post(config.apiUrl+'/sale/createSaleTempDetail', payload)
@@ -461,13 +474,11 @@ const Page = () => {
         try{
             const payload = {
                 tableNo: table,
-                userId: parseInt(localStorage.getItem("food_id") || "0")
+                userId: parseInt(localStorage.getItem("food_id") || "0"),
+                userName: localStorage.getItem("food_name") || ""
             }
             const res = await axios.post(config.apiUrl+'/sale/printBillBeforePay', payload)
 
-            if(res.status == 200){
-                toast.success("พิมพ์ใบแจ้งรายการสำเร็จ",{autoClose:2000})
-            }
 
             setTimeout(() => {
                 setBillUrl(res.data.fileName)
@@ -505,7 +516,7 @@ const Page = () => {
                     payType: payType,
                     inputMoney: inputMoney,
                     amount: amount + amountAdded,
-                    returnMoney: inputMoney - (amount + amountAdded)
+                    returnMoney: inputMoney - (amountIncludeVat)
                 }
                 const res = await axios.post(config.apiUrl+'/sale/endSale', payload)
                 if(res.status == 200){
@@ -559,17 +570,17 @@ const Page = () => {
 
     return (
         <div className="flex gap-4">
-        <div className="space-y-4 sm:w-9/12">
+        <div className="space-y-4 lg:w-9/12">
          <h3 className="font-bold ">ขายสินค้า</h3>
          <hr className="border-1 border-emerald-500"/>
-            <div className="md:flex gap-2">
+            <div className="lg:flex gap-2">
                <div className="flex sm:h-10">
                     <h3 className="shadow-2xl px-2 py-1 rounded-l-3xl bg-black/20 border border-zinc-700  text-white" >โต๊ะ</h3>
                     <input ref={myRef} value={table} onChange={e=>setTable(parseInt(e.target.value))} type="text" className="border pl-1 rounded-r-3xl focus:outline-none text-sm shadow-2xl px-2 bg-zinc-800  border-zinc-700  text-white" />
                </div>
                <div className="max-xs:grid max-xs:grid-cols-3 space-x-2 sm:space-y-1 py-2">
                     <button onClick={e=>filterFood('food')} className="text-sm md:text-base
-                    sm:px-2 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
+                    sm:px-2 max-lg:px-3 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
                             <div className="flex max-xs:justify-center items-center gap-1">
                                 <div className="max-xs:hidden">
                                     <i className="fa fa-hamburger "></i> 
@@ -579,7 +590,7 @@ const Page = () => {
                     </button>
 
                     <button onClick={e=>filterFood('drink')} className="text-sm md:text-base
-                    sm:px-2 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
+                    sm:px-2 max-lg:px-3 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
                             <div className="flex max-xs:justify-center items-center gap-1">
                                 
                                 <div className="max-xs:hidden">
@@ -590,7 +601,7 @@ const Page = () => {
                     </button>
 
                     <button onClick={e=>filterFood('all')} className="text-sm md:text-base
-                    sm:px-2 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
+                    sm:px-2 max-lg:px-3 py-1 bg-blue-500 hover:bg-blue-400 cursor-pointer rounded-3xl">
                             <div className="flex max-xs:justify-center items-center gap-1"> 
                                 <div className="max-xs:hidden">
                                     <i className="fa fa-list "></i> 
@@ -608,17 +619,17 @@ const Page = () => {
                     </button>
                     {amount > 0 ?
                     <button onClick={e=>printBillBeforePay()} className="max-xs:hidden text-sm md:text-base
-                    px-2 py-1 bg-emerald-500 hover:bg-emerald-400 cursor-pointer rounded-3xl">
+                    px-2 py-1 bg-emerald-500 hover:bg-emerald-400 cursor-pointer rounded-3xl max-lg:text-[15px]">
                             <i className="fa fa-print "></i> พิมพ์ใบแจ้งรายการ
                     </button>
                     :
                     <button disabled className="max-xs:hidden text-sm md:text-base
-                    px-2 py-1 bg-gray-500  rounded-3xl">
+                    px-2 py-1 bg-gray-500  rounded-3xl max-lg:text-[15px]">
                             <i className="fa fa-print "></i> พิมพ์ใบแจ้งรายการ
                     </button>}
                </div>
             </div>
-            <div className="grid max-xs:grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid max-xs:grid-cols-2 sm:grid-cols-4 max-lg:grid-cols-4 gap-4">
                 {foods.map((item: Food) => (
                     <div
                     key={item.id}
@@ -640,15 +651,26 @@ const Page = () => {
 
         </div>
         {saleTemp.length > 0 && (
-            <div onClick={openModalCart} className="fixed sm:hidden bottom-5 right-6 bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-full">
+            <div onClick={openModalCart} className="fixed lg:hidden max-xs:bottom-5 max-lg:bottom-10 max-xs:right-6 max-lg:right-10 bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-full">
             <p className="absolute -top-2 -right-2 bg-red-500 px-2 rounded-full">{saleTemp.length}</p>
             <i className="fa-solid fa-cart-plus"></i>
         </div>
-        )}
-        <div className="max-xs:hidden w-4/12 mt-10 space-y-4 ">
-            <div className="text-end text-2xl md:text-4xl w-full bg-black shadow-2xl p-2 md:p-4 rounded-3xl">
-                {(amount + amountAdded).toLocaleString("TH-th")+" .-"}
+        )}  
+        <div className="max-xs:hidden max-lg:hidden w-4/12 mt-10 space-y-4 ">
+            <div className="flex justify-between text-2xl md:text-4xl w-full bg-black shadow-2xl p-2 md:p-4 rounded-3xl">
+                 <p>ยอดสุทธิ :</p>
+                {(amountIncludeVat).toLocaleString("TH-th")+" .-"}
             </div>
+
+            <div className="flex justify-between text-2xl w-full bg-black shadow-2xl p-2 rounded-3xl">
+                <p>ราคาทั้งหมด :</p>
+                <p> {(amount).toLocaleString("TH-th")+" .-"}</p>
+            </div>
+            <div className="flex justify-between text-2xl w-full bg-black shadow-2xl p-2 rounded-3xl">
+                <p>vat 7% :</p>
+                <p> {(amount * 0.07).toLocaleString("TH-th")+" .-"}</p>
+            </div>
+             
 
             {amount >  0 ? 
             <button onClick={openModalEndSale} className="px-4 py-3 bg-green-600 w-full rounded-xl hover:bg-green-500 transition-colors duration-300 cursor-pointer ">
@@ -688,35 +710,35 @@ const Page = () => {
                 </div>
           )):<></>}
         </div>
-            <Modal open={openEdit} onClose={closeModalEdit} title="แก้ไขรายการ" modalSize="max-w-5xl">
+            <Modal open={openEdit} onClose={closeModalEdit} title="แก้ไขรายการ" modalSize="max-w-5xl" zIndex={60}>
                 <div className="space-y-3 ">
                    <div>
-                    <button onClick={createSaleTempDetail} className="px-4 py-2 rounded-3xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer">
+                    <button onClick={createSaleTempDetail} className="btn-add">
                         <i className="fa fa-plus me-2"></i>
                         เพิ่มรายการ
                     </button>
                    </div>
-                <table className="w-full border-collapse rounded-xl overflow-hidden">
-                    <thead className="bg-zinc-800 text-zinc-300">
+                <table className="table">
+                    <thead >
                     <tr>
-                        <th className="px-4 py-3 text-center"></th>
-                        <th className="px-4 py-3 text-left">ชื่ออาหาร</th>
-                        <th className="px-4 py-3 text-center">รสชาติ</th>
-                        <th className="px-4 py-3 text-center">ขนาด</th>
+                        <th className="text-center"></th>
+                        <th className="text-left">ชื่ออาหาร</th>
+                        <th className="text-center">รสชาติ</th>
+                        <th className="text-center">ขนาด</th>
                     </tr>
                     </thead>
                     <tbody>
                         {saleTempDetails.length > 0 ? saleTempDetails.map((item:SaleTempDetail) => (
-                            <tr key={item.id}  className="hover:bg-zinc-600 bg-zinc-700">
-                                <td className="text-center px-4 py-3">
-                                    <button onClick={e=>removeSaleTempDetail(item.id)} className=" bg-red-500 hover:bg-red-400 transition-colors duration-300 rounded-md cursor-pointer">
+                            <tr key={item.id}>
+                                <td className="text-center ">
+                                    <button onClick={e=>removeSaleTempDetail(item.id)} className="p-1 bg-red-500 hover:bg-red-400 transition-colors duration-300 rounded-md cursor-pointer">
                                         <i className="fa fa-times"></i>
                                     </button>
                                 </td>
-                                <td className="px-4 py-3">
+                                <td >
                                     {item.Food.name}
                                 </td>
-                                <td className="px-4 py-3 text-center">
+                                <td className="text-center">
                                     {tastes.map((tastes: Taste)=> (
                                         item.tasteId === tastes.id ?
                                         <button className="font-light px-1 border border-red-500 rounded-md bg-red-500 text-white hover:text-red-500 hover:border-red-500 hover:bg-transparent cursor-pointer transition-all duration-300" 
@@ -730,7 +752,7 @@ const Page = () => {
                                         key={tastes.id}>{tastes.name}</button>
                                     ))}
                                 </td>
-                                  <td className="px-4 py-3 text-center">
+                                  <td className="text-center">
                                     {sizes.map((sizes: FoodSize)=> (
                                         item.foodSizeId == sizes.id ?
                                          <button  
@@ -775,7 +797,7 @@ const Page = () => {
 
                    <div>
                         <h3>ยอดเงิน</h3>
-                        <input disabled className="w-full text-3xl focus:outline-0 rounded-3xl pr-3 py-2 bg-gray-700 text-end " value={(amount + amountAdded).toLocaleString("TH-th")+" .-"}  />
+                        <input disabled className="w-full text-3xl focus:outline-0 rounded-3xl pr-3 py-2 bg-gray-700 text-end " value={(amount + (amount * 0.07)).toLocaleString("TH-th")+" .-"}  />
                    </div>
 
                    <div className="space-y-1">
@@ -803,29 +825,31 @@ const Page = () => {
                         </div>
                         <input 
                         value={inputMoney}
-                        onChange={e=> setInputMoney(parseInt(e.target.value))}
+                        onChange={e=> setInputMoney(Number(e.target.value))}
                         type="number" className="w-full text-xl focus:outline-0 rounded-3xl pr-1 py-2  border text-end "  />
                    </div>
 
                     <div>
                         <h3>เงินทอน</h3>
                         <input disabled className="w-full text-3xl focus:outline-0 rounded-3xl pr-3 py-2 bg-gray-700 text-end " 
-                        value={inputMoney - (amount + amountAdded)}  />
+                        value={(inputMoney - amountIncludeVat).toLocaleString("th-TH")}  />
                    </div>
 
                    <div className="flex gap-4 ">
                         <button 
-                        onClick={e=>setInputMoney(amount + amountAdded)}
+                        onClick={e=>setInputMoney(amountIncludeVat)}
                         className="w-full bg-blue-500 py-2 hover:bg-blue-600 cursor-pointer rounded-3xl ">จ่ายพอดี</button>
                         <button 
                         onClick={e=>endSale()}
-                        className="w-full bg-green-500 py-2 hover:bg-green-600 cursor-pointer rounded-3xl ">จบการขาย</button>
+                        className={inputMoney >= amountIncludeVat ? "w-full bg-green-500 py-2 hover:bg-green-600 cursor-pointer rounded-3xl " 
+                        : "w-full bg-gray-500 py-2 cursor-not-allowed rounded-3xl "} 
+                        disabled={inputMoney < amountIncludeVat}>จบการขาย</button>
                    </div>
                 </div>
             </Modal>
 
             <button id="btnPrint" style={{display:"none"}} onClick={openModalBill}></button>
-            <Modal open={openBill} onClose={closeModalBill} title="พิมพ์ใบแจ้งรายการ" >
+            <Modal open={openBill} onClose={closeModalBill} title="พิมพ์ใบแจ้งรายการ" zIndex={60}>
                 <div className="space-y-4">
                     <iframe src={`${config.pathImg}/${billUrl}`} className="w-full h-[600px]"></iframe>
                 </div>
@@ -835,9 +859,22 @@ const Page = () => {
             <Modal open={openCart} onClose={closeModalCart} title="รายการอาหาร">
                 <div className="flex flex-col h-[85vh] sm:h-[75vh]">
 
-                    <div className="shrink-0 text-end text-2xl bg-black shadow-xl px-4 py-3 rounded-2xl">
-                    {(amount + amountAdded).toLocaleString("TH-th")} .-
+                   <div className="space-y-4">
+                     <div className="flex justify-between text-2xl md:text-4xl w-full bg-black shadow-2xl p-2 md:p-4 rounded-3xl">
+                        <p>ยอดสุทธิ :</p>
+                        {(amountIncludeVat).toLocaleString("TH-th")+" .-"}
                     </div>
+
+                    <div className="flex justify-between text-2xl w-full bg-black shadow-2xl p-2 rounded-3xl">
+                        <p>ราคาทั้งหมด :</p>
+                        <p> {(amount).toLocaleString("TH-th")+" .-"}</p>
+                    </div>
+                    
+                    <div className="flex justify-between text-2xl w-full bg-black shadow-2xl p-2 rounded-3xl">
+                        <p>vat 7% :</p>
+                        <p> {(amount * 0.07).toLocaleString("TH-th")+" .-"}</p>
+                    </div>
+                   </div>
 
                     <div className="flex-1 overflow-y-auto space-y-4 mt-4 pr-1">
 
@@ -904,6 +941,14 @@ const Page = () => {
 
                     
                     <div className="shrink-0 pt-4">
+                    <div className="flex justify-center items-center gap-2 pb-2">
+                        <button onClick={e=>printBillBeforePay()} className="text-[18px] px-1 bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors">
+                            พิมพ์ใบแจ้งรายการ
+                        </button>
+                         <button onClick={e=>removeAllSaleTemp()} className="text-[18px] px-1 bg-red-600 hover:bg-red-500 rounded-xl transition-colors">
+                            ล้างรายการทั้งหมด
+                        </button>
+                    </div>
                     <button
                         onClick={openModalEndSale}
                         className="w-full px-4 py-3 bg-green-600 hover:bg-green-500 rounded-xl transition-colors"
@@ -911,6 +956,8 @@ const Page = () => {
                         <i className="fa fa-check me-2"></i>
                         จบการขาย
                     </button>
+
+              
                     </div>
                 </div>
             </Modal>

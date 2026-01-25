@@ -175,7 +175,7 @@ const Page = () => {
 
                     
                     <div className="flex flex-col space-y-2">
-                        <label className="text-sm font-semibold text-gray-300">โลโก้</label>
+                        <label className="text-sm font-semibold text-gray-300">คิวอาร์โค้ด</label>
                         {logo && (
                             <img src={config.pathImg + '/uploads/' + logo} alt="Logo" className="w-32 h-32 object-contain mb-2 rounded-md"/>
                         )}
